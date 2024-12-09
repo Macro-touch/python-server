@@ -170,13 +170,13 @@ def process_pdf(file, password, output_name, threshold, lang):
     return segregate(final_data, threshold, lang)
 
 
-extract_data("statements/h.pdf")
+# extract_data("statements/h.pdf")
 
-# if __name__ == "__main__":
-#     file = sys.argv[1]
-#     password = "" if sys.argv[2] == "null" else str(sys.argv[2])
-#     output_name = sys.argv[3]
-#     threshold = 0 if sys.argv[4] == "null" else str(sys.argv[4])
-#     lang = 0 if sys.argv[5] == "null" else int(sys.argv[5])
+if __name__ == "__main__":
+    file = sys.argv[1]
+    password = "" if sys.argv[2] == "null" else str(sys.argv[2])
+    output_name = sys.argv[3]
+    threshold = 0 if sys.argv[4] == "null" else str(sys.argv[4])
+    lang = 0 if sys.argv[5] == "null" else int(sys.argv[5])
 
-#     process_pdf(file, password, output_name, threshold, lang)
+    process_pdf(file, password, output_name, threshold, lang)
