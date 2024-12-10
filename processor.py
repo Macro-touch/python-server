@@ -151,15 +151,15 @@ def without_breaker_(pdf):
 def extract_data(pdf_path):
     with pdfplumber.open(pdf_path) as pdf:
         # with_breaker(pdf)
-        without_breaker(pdf)
+        # without_breaker(pdf)
 
-    # table_data = (
-    #     with_breaker(pdf)
-    #     if json.dumps(with_breaker(pdf)) != "[]"
-    #     else without_breaker(pdf)
-    # )
+        table_data = (
+            with_breaker(pdf)
+            if json.dumps(with_breaker(pdf)) != "[]"
+            else without_breaker(pdf)
+        )
 
-    # return table_data
+        return table_data
 
 
 def process_pdf(file, password, output_name, threshold, lang):
