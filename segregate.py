@@ -316,10 +316,10 @@ def segregate(data, threshold: int, current_lang: int):
             )
 
             entry = {
-                "DATE": date,
-                "DESCRIPTION": desc,
-                "AMOUNT": amount,
-                "TYPE": transc_type,
+                "date": date,
+                "description": desc,
+                "type": transc_type,
+                "amount": amount,
             }
 
             # print(entry)
