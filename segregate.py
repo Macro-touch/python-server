@@ -822,18 +822,20 @@ def segregate(data, threshold: int, current_lang: int):
 
     if len(final) > 0 and len(govt_list) > 0:
 
-        return {
-            "data": final,
-            "govt_list": govt_list,
-            "outflow_labels": outflow_labels,
-            "inflow_labels": inflow_labels,
-            "lang": current_lang,
-            "table_headings": table_headings,
-            "chart_data": chart_data,
-            "total_income": total_income,
-            "total_outcome": total_outcome,
-            "line_chart_data": [date_data, graph_months],
-        }
+        return result
+
+        # return {
+        #     "data": final,
+        #     "govt_list": govt_list,
+        #     "outflow_labels": outflow_labels,
+        #     "inflow_labels": inflow_labels,
+        #     "lang": current_lang,
+        #     "table_headings": table_headings,
+        #     "chart_data": chart_data,
+        #     "total_income": total_income,
+        #     "total_outcome": total_outcome,
+        #     "line_chart_data": [date_data, graph_months],
+        # }
 
         # create(
         #     final,
