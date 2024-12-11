@@ -108,7 +108,6 @@ def line_chart(data):
 
 
 def create_pie_chart(data, total_income, total_outcome, labels):
-    print(data)
     if len(data) > 1:
         # Calculate total for percentage calculation
         # total = sum(data[1:])
@@ -157,7 +156,7 @@ def create_pdf(
     outflow_labels,
     inflow_labels,
 ):
-
+    print(data)
     space_added = False
     total_len = 12
     remain_len = 0
