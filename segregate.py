@@ -13,6 +13,8 @@ def segregate(data: list[dict], threshold: int, lang: int):
     attr_result = []
     deduction = []
 
+    print(data)
+
     govt_categories = {
         "TDS": [],
         "Grant": [],
@@ -440,6 +442,8 @@ def segregate(data: list[dict], threshold: int, lang: int):
     table_headings.append(f"Interest credited and debited")
 
     if len(final) > 0 and len(govt_list) > 0:
+        print(date_data)
+        print(graph_months)
         return create_pdf(
             final,
             govt_list=govt_list,
