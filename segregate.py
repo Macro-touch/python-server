@@ -4,7 +4,7 @@ from keyword_checker import KeywordChecker
 from generate_pdf import create_pdf
 
 
-def segregate(data, threshold: int, lang: int):
+def segregate(data: list[dict], threshold: int, lang: int):
     m_o_p = {}
     charges = []
     hvt_list = []

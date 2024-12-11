@@ -47,7 +47,7 @@ def upload_pdf():
 
     # ######### Extract and validate parameters ######### #
     try:
-        data = request.form.get("data", {})
+        data = request.form.get("transaction", [])
         threshold = int(request.form.get("threshold", 0))
         lang = int(request.form.get("lang", 0))
 
