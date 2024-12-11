@@ -142,7 +142,7 @@ def create_pie_chart(data, total_income, total_outcome, labels):
     return drawing
 
 
-def create(
+def create_pdf(
     data,
     govt_list,
     table_headings,
@@ -440,4 +440,4 @@ def create(
 
 
 if __name__ == "__main__":
-    create()
+    create_pdf()
