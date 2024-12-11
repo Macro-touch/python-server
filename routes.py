@@ -45,6 +45,8 @@ def upload_pdf():
 @pdf_routes.route("/create-pdf", methods=["POST"])
 def create_pdf():
 
+    print(request.form.get("transactions", []))
+
     # ######### Extract and validate parameters ######### #
     try:
         data = request.form.get("transactions", [])
