@@ -3,6 +3,7 @@ from processor import process_pdf
 import os
 import traceback
 from werkzeug.utils import secure_filename
+from segregate import segregate
 
 pdf_routes = Blueprint("pdf_routes", __name__)
 
@@ -17,30 +18,50 @@ def upload_pdf():
         return jsonify({"error": "No selected file"}), 400
 
     # Extract and validate parameters
-    try:
-        password = request.form.get("password", "")
-        output_name = request.form.get("output_name", "output")
-        threshold = int(request.form.get("threshold", 0))
-        lang = int(request.form.get("lang", 0))
-    except ValueError:
-        return jsonify({"error": "Threshold and lang must be valid integers"}), 400
+    password = request.form.get("password", "")
+    # output_name = request.form.get("output_name", "output")
 
     try:
         # Create the uploads directory if it doesn't exist
-        UPLOAD_DIR = os.path.join(os.getcwd(), "uploads")
-        os.makedirs(UPLOAD_DIR, exist_ok=True)
+        upload_dir = os.path.join(os.getcwd(), "uploads")
+        os.makedirs(upload_dir, exist_ok=True)
 
         # Secure the filename
-        pdf_path = os.path.join(UPLOAD_DIR, secure_filename(pdf_file.filename))
+        pdf_path = os.path.join(upload_dir, secure_filename(pdf_file.filename))
         pdf_file.save(pdf_path)
 
         # Process the PDF
-        result_json = process_pdf(pdf_path, password, output_name, threshold, lang)
+        result_json = process_pdf(pdf_path, password, 'result')
         return jsonify(result_json), 200
 
     except Exception as e:
         traceback.print_exc()
         return (
             jsonify({"error": "An unexpected error occurred", "details": str(e)}),
+            500,
+        )
+
+@pdf_routes.route("/create-pdf", methods=["POST"])
+def upload_pdf():
+
+    # ######### Extract and validate parameters ######### #
+    try:
+        data = request.form.get("data", {})
+        threshold = int(request.form.get("threshold", 0))
+        lang = int(request.form.get("lang", 0))
+
+    except ValueError:
+        return jsonify({"error": "Threshold and lang must be valid integers"}), 400
+
+
+    # ######### Proceeding to PDF Generation ######### #
+    try:
+        result = segregate(data, threshold, lang)
+        return jsonify({"message": "PDF processed successfully", "result": result}), 200
+
+    except Exception as e:
+        traceback.print_exc()
+        return (
+            jsonify({"error": "Error processing PDF", "details": str(e)}),
             500,
         )

@@ -1,7 +1,7 @@
 # segregate.py
 
 import re
-from pdf_generate import create_pdf
+from generate_pdf import create_pdf
 
 MONTHS = [
     "January",

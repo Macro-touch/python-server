@@ -60,7 +60,6 @@ def is_header_row(
     Check if a row is a header row and return the indices of relevant columns.
     :param row: List of strings representing a row.
     :param keywords: Dictionary of keyword lists for each column type.
-    :param exclude: List of column names to ignore.
     :return: Tuple (is_header: bool, indices: dict) or None if not a header row.
     """
 
@@ -125,7 +124,7 @@ def is_broken_desc_row(row: List[str]) -> Optional[Tuple[bool, int]]:
     index = 0
 
     for i, cell in enumerate(row):
-        if cell != None and len(cell) > 1:
+        if cell is not None and len(cell) > 1:
             index = i
             count = count + 1
 
@@ -152,7 +151,7 @@ def clean_row(row: List[str], header_len: int, indeces: dict) -> List[str]:
             desc_index = indeces.get("description")
             broken_row_desc = row[desc_index + 1]
 
-            if len(broken_row_desc) > 1 and len(broken_row_desc) <= 10:
+            if 1 < len(broken_row_desc) <= 10:
                 row[desc_index] = row[desc_index] + " " + broken_row_desc
                 row.pop(desc_index + 1)
 
@@ -193,25 +192,25 @@ def extract_table_strategy(page) -> List:
     return tables
 
 
-def create_entry(row: List[str], indeces: dict) -> dict:
+def create_entry(row: List[str], indices: dict) -> dict:
     """
-    Recieves row as argument and returns formatted entry
+    Receives row as argument and returns formatted entry
     """
     return {
-        "date": row[indeces.get("date")],
-        "description": row[indeces.get("description")],
+        "date": row[indices.get("date")],
+        "description": row[indices.get("description")],
         "cr/dr": (
-            row[indeces.get("cr/dr")]
-            if indeces.get("cr/dr")
-            else ("cr" if is_valid_amount(row[indeces.get("credit")]) else "dr")
+            row[indices.get("cr/dr")]
+            if indices.get("cr/dr")
+            else ("cr" if is_valid_amount(row[indices.get("credit")]) else "dr")
         ),
         "amount": (
-            row[indeces.get("amount")]
-            if indeces.get("amount")
+            row[indices.get("amount")]
+            if indices.get("amount")
             else (
-                row[indeces.get("credit")]
-                if is_valid_amount(row[indeces.get("credit")])
-                else row[indeces.get("debit")]
+                row[indices.get("credit")]
+                if is_valid_amount(row[indices.get("credit")])
+                else row[indices.get("debit")]
             )
         ),
     }
