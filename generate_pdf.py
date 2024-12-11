@@ -70,9 +70,6 @@ def line_chart(data):
     cr_values = [month_data["CR"] for month_data in data[0].values()]
     values = [dr_values, cr_values]
 
-    print(dr_values)
-    print(cr_values)
-
     # labels = [[str(value) for value in row] for row in values]
 
     min_value = min(dr_values) if min(dr_values) < min(cr_values) else min(cr_values)
@@ -156,7 +153,6 @@ def create_pdf(
     outflow_labels,
     inflow_labels,
 ):
-    print(data)
     space_added = False
     total_len = 12
     remain_len = 0

@@ -45,7 +45,9 @@ def upload_pdf():
 @pdf_routes.route("/create-pdf", methods=["POST"])
 def create_pdf():
 
+    print("Transactions:\n", flush=True)
     print(request.form.get("transactions"), flush=True)
+    print("==============================", flush=True)
     # ######### Extract and validate parameters ######### #
     try:
         data = request.form.get("transactions", [])
@@ -57,7 +59,6 @@ def create_pdf():
 
     # ######### Proceeding to PDF Generation ######### #
     try:
-        print(data)
         result_file_path = segregate(data, threshold, lang)
 
         # ######### Proceeding to PDF Generation ######### #
