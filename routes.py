@@ -47,9 +47,9 @@ def create_pdf():
 
     # ######### Extract and validate parameters ######### #
     try:
-        data = request.form.get("transaction", [])
+        data = request.form.get("transactions", [])
         threshold = int(request.form.get("threshold", 0))
-        lang = int(request.form.get("lang", 0))
+        lang = int(request.form.get("language", 0))
 
     except ValueError:
         return jsonify({"error": "Threshold and lang must be valid integers"}), 400
