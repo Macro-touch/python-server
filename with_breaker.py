@@ -17,10 +17,10 @@ def with_breaker(pdf):
             {
                 headers[col]: (
                     float(val)
-                    if val != None and val.isdigit()
+                    if val is not None and val.isdigit()
                     else (
                         val.split("\n")[0]
-                        if val != None and bool(contains_new_line.match(val))
+                        if val is not None and bool(contains_new_line.match(val))
                         else val
                     )
                 )
@@ -30,8 +30,8 @@ def with_breaker(pdf):
             for row in tables[1:]
         ]
 
-        for t in table_data:
-            print(t)
+        # for t in table_data:
+        #     print(t)
 
         return table_data
 

@@ -273,7 +273,7 @@ def without_breaker(pdf):
             if index == len(tables) - 1 and entry:
                 entries.append(entry)
 
-    for e in entries:
-        print(e)
+    # for e in entries:
+    #     print(e)
 
     return entries

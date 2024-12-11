@@ -47,7 +47,13 @@ def segregate(data: list[dict], threshold: int, lang: int):
                 and (len(amount) > 1)
                 and (len(trans_type) > 1)
             ):
-                attr_result.append(entry)
+                attr_entry = {
+                    "date": date,
+                    "description": desc_attribute,
+                    "amount": amount,
+                    "type": trans_type,
+                }
+                attr_result.append(attr_entry)
         else:
             pass
         # ############# Checking whether the entry comes under attribute classification ############# #
@@ -75,7 +81,7 @@ def segregate(data: list[dict], threshold: int, lang: int):
         # ############# Verifying Mode of payments ############# #
 
         # ############# Validating Deductions ############# #
-        sub_entry = [entry["DATE"], entry["DESCRIPTION"], entry["AMOUNT"]]
+        sub_entry = [entry["date"], entry["description"], entry["amount"]]
         is_deduction = checker.deduction_checker()
         if bool(is_deduction):
             deduction.append(sub_entry)
@@ -164,14 +170,14 @@ def segregate(data: list[dict], threshold: int, lang: int):
     mode_list = []
     for key, value in m_o_p.items():
         d_imps = sum(
-            float(obj["AMOUNT"].replace(",", ""))
+            float(obj["amount"].replace(",", ""))
             for obj in value
-            if obj["TYPE"] == "DR" and float(obj["AMOUNT"].replace(",", "")) > 0
+            if obj["type"] == "DR" and float(obj["amount"].replace(",", "")) > 0
         )
         c_imps = sum(
-            float(obj["AMOUNT"].replace(",", ""))
+            float(obj["amount"].replace(",", ""))
             for obj in value
-            if obj["TYPE"] == "CR" and float(obj["AMOUNT"].replace(",", "")) > 0
+            if obj["type"] == "CR" and float(obj["amount"].replace(",", "")) > 0
         )
         mode_list.append(
             [key, str(len(value)), "{:.2f}".format(d_imps), "{:.2f}".format(c_imps)]
@@ -218,7 +224,7 @@ def segregate(data: list[dict], threshold: int, lang: int):
 
     duplicates = [list(my_dict.values()) for my_dict in duplicate_list]
     dup_header = table_lang_head[4]
-    # dup_header = ['Date', 'Decription', 'Amount', 'Type']
+    # dup_header = ['Date', 'Description', 'Amount', 'Type']
 
     if len(duplicates) > 0:
         duplicates.insert(0, dup_header)
@@ -243,7 +249,7 @@ def segregate(data: list[dict], threshold: int, lang: int):
 
     for my_dict in attr_result:
 
-        # --------------- Attr. Classftn. --------------- #
+        # --------------- Attr. Classification. --------------- #
         description_value = my_dict["description"]
         amount_value = float(my_dict["amount"].replace(",", ""))
         transaction_type = my_dict["type"]
@@ -296,9 +302,9 @@ def segregate(data: list[dict], threshold: int, lang: int):
 
         max_amount = amount_value if amount_value > max_amount else max_amount
 
-        if my_dict["TYPE"] == "Debit":
+        if my_dict["type"] == "DR":
             graph_dots.append((0, amount_value))
-        if my_dict["TYPE"] == "Credit":
+        if my_dict["type"] == "CR":
             graph_dots.append((amount_value, 0))
 
     attributes_list = [

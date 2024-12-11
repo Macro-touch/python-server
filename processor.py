@@ -9,6 +9,7 @@ from create_entry import extract_entries
 from without_breaker import without_breaker
 from with_breaker import with_breaker
 
+
 def decrypt_pdf(file, password, output_name):
     pdf_reader = PyPDF2.PdfReader(open(file, "rb"))
     if pdf_reader.is_encrypted:
@@ -44,6 +45,7 @@ def process_pdf(file, password, output_name):
     os.remove(decrypted_file)
 
     return extract_entries(final_data)
+    # print((segregate(extract_entries(final_data), 0, 0)))
 
 
 if __name__ == "__main__":
@@ -53,4 +55,4 @@ if __name__ == "__main__":
 
     process_pdf(file, password, output_name)
 
-# extract_data("statements/h.pdf")
+# process_pdf("statements/BOB bank.pdf", '', 'report')
