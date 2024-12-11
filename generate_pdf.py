@@ -70,6 +70,9 @@ def line_chart(data):
     cr_values = [month_data["CR"] for month_data in data[0].values()]
     values = [dr_values, cr_values]
 
+    print(dr_values)
+    print(cr_values)
+
     # labels = [[str(value) for value in row] for row in values]
 
     min_value = min(dr_values) if min(dr_values) < min(cr_values) else min(cr_values)
@@ -105,7 +108,7 @@ def line_chart(data):
 
 
 def create_pie_chart(data, total_income, total_outcome, labels):
-    # print(data)
+    print(data)
     if len(data) > 1:
         # Calculate total for percentage calculation
         # total = sum(data[1:])
