@@ -56,6 +56,7 @@ def create_pdf():
 
     # ######### Proceeding to PDF Generation ######### #
     try:
+        print(data)
         result_file_path = segregate(data, threshold, lang)
 
         # ######### Proceeding to PDF Generation ######### #
