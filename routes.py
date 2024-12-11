@@ -43,7 +43,7 @@ def upload_pdf():
 
 
 @pdf_routes.route("/create-pdf", methods=["POST"])
-def upload_pdf():
+def create_pdf():
 
     # ######### Extract and validate parameters ######### #
     try:
