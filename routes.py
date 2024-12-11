@@ -48,6 +48,15 @@ def create_pdf():
     print("Transactions:\n", flush=True)
     print(request.form.get("transactions"), flush=True)
     print("==============================", flush=True)
+
+    print("Threshold:\n", flush=True)
+    print(request.form.get("threshold"), flush=True)
+    print("==============================", flush=True)
+
+    print("Language:\n", flush=True)
+    print(request.form.get("language"), flush=True)
+    print("==============================", flush=True)
+
     # ######### Extract and validate parameters ######### #
     try:
         data = request.form.get("transactions", [])
