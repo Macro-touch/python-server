@@ -31,10 +31,10 @@ def segregate(data, threshold: int, lang: int):
     table_lang_head = lang_heading[lang]
 
     for entry in data:
-        date = entry.get('date')
-        desc = entry.get('description')
-        amount = entry.get('amount')
-        trans_type = entry.get('type')
+        date = entry.get("date")
+        desc = entry.get("description")
+        amount = entry.get("amount")
+        trans_type = entry.get("type")
 
         # ############# Checking whether the entry comes under attribute classification ############# #
         checker = KeywordChecker(desc)
@@ -52,13 +52,11 @@ def segregate(data, threshold: int, lang: int):
             pass
         # ############# Checking whether the entry comes under attribute classification ############# #
 
-
         # ############# Checking whether the entry comes charges ############# #
         charge_result = checker.contains_non_alphabet_substring()
         if bool(charge_result):
             charges.append(entry)
         # ############# Checking whether the entry comes under charges ############# #
-
 
         # ############# Total income outcome ############# #
         if trans_type == "DR":
@@ -70,13 +68,11 @@ def segregate(data, threshold: int, lang: int):
             total_outcome[1] += 1
         # ############# Total income outcome ############# #
 
-
         # ############# Verifying Mode of payments ############# #
         mode = classifier.mode_of_payment_finder()
         if mode:
             m_o_p.setdefault(mode, []).append(entry)
         # ############# Verifying Mode of payments ############# #
-
 
         # ############# Validating Deductions ############# #
         sub_entry = [entry["DATE"], entry["DESCRIPTION"], entry["AMOUNT"]]
@@ -85,11 +81,9 @@ def segregate(data, threshold: int, lang: int):
             deduction.append(sub_entry)
         # ############# Validating Deductions ############# #
 
-
         # ############# Extracting Govt. Lists ############# #
-        classifier.categorize_govt_entry(sub_entry, entry['type'], govt_categories)
+        classifier.categorize_govt_entry(sub_entry, entry["type"], govt_categories)
         # ############# Extracting Deductions ############# #
-
 
         # ############# Validating High Value Transaction ############# #
         if float(threshold) > 0 and (float(amount) > float(threshold)):
@@ -101,7 +95,6 @@ def segregate(data, threshold: int, lang: int):
             ]
             hvt_list.append(new_hvt)
         # ############# Validating High Value Transaction ############# #
-
 
     # Unusual Transaction
     date = ""
@@ -351,25 +344,25 @@ def segregate(data, threshold: int, lang: int):
 
     # TDS
     govt_heading = table_lang_head[6]
-    if len(govt_categories['TDS']) > 0:
-        govt_categories['TDS'].insert(0, govt_heading)
-        govt_list.append(govt_categories['TDS'])
+    if len(govt_categories["TDS"]) > 0:
+        govt_categories["TDS"].insert(0, govt_heading)
+        govt_list.append(govt_categories["TDS"])
 
     else:
-        govt_categories['TDS'].append(["-", "-", "-"])
-        govt_categories['TDS'].insert(0, govt_heading)
-        govt_list.append(govt_categories['TDS'])
+        govt_categories["TDS"].append(["-", "-", "-"])
+        govt_categories["TDS"].insert(0, govt_heading)
+        govt_list.append(govt_categories["TDS"])
     table_headings.append(f"List of TDS detucted")
     # print(govt_categories['TDS'])
 
-    if len(govt_categories['Grant']) > 0:
-        govt_categories['Grant'].insert(0, govt_heading)
-        govt_list.append(govt_categories['Grant'])
+    if len(govt_categories["Grant"]) > 0:
+        govt_categories["Grant"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Grant"])
 
     else:
-        govt_categories['Grant'].append(["-", "-", "-"])
-        govt_categories['Grant'].insert(0, govt_heading)
-        govt_list.append(govt_categories['Grant'])
+        govt_categories["Grant"].append(["-", "-", "-"])
+        govt_categories["Grant"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Grant"])
     table_headings.append(f"Recepit of Government Grant")
     # print(govt_categories['Grant'])
 
@@ -384,64 +377,64 @@ def segregate(data, threshold: int, lang: int):
     table_headings.append(f"Deduction")
     # print(deduction)
 
-    if len(govt_categories['Tax Refund']) > 0:
-        govt_categories['Tax Refund'].insert(0, govt_heading)
-        govt_list.append(govt_categories['Tax Refund'])
+    if len(govt_categories["Tax Refund"]) > 0:
+        govt_categories["Tax Refund"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Tax Refund"])
 
     else:
-        govt_categories['Tax Refund'].append(["-", "-", "-"])
-        govt_categories['Tax Refund'].insert(0, govt_heading)
-        govt_list.append(govt_categories['Tax Refund'])
+        govt_categories["Tax Refund"].append(["-", "-", "-"])
+        govt_categories["Tax Refund"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Tax Refund"])
     table_headings.append(f"Tax Refund")
     # print(govt_categories['Tax Refund'])
 
-    if len(govt_categories['Advance Tax']) > 0:
-        govt_categories['Advance Tax'].insert(0, govt_heading)
-        govt_list.append(govt_categories['Advance Tax'])
+    if len(govt_categories["Advance Tax"]) > 0:
+        govt_categories["Advance Tax"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Advance Tax"])
 
     else:
-        govt_categories['Advance Tax'].append(["-", "-", "-"])
-        govt_categories['Advance Tax'].insert(0, govt_heading)
-        govt_list.append(govt_categories['Advance Tax'])
+        govt_categories["Advance Tax"].append(["-", "-", "-"])
+        govt_categories["Advance Tax"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Advance Tax"])
     table_headings.append(f"Advance tax")
     # print(govt_categories['Advance Tax'])
 
-    if len(govt_categories['EMI']) > 0:
-        govt_categories['EMI'].insert(0, govt_heading)
-        govt_list.append(govt_categories['EMI'])
+    if len(govt_categories["EMI"]) > 0:
+        govt_categories["EMI"].insert(0, govt_heading)
+        govt_list.append(govt_categories["EMI"])
 
     else:
-        govt_categories['EMI'].append(["-", "-", "-"])
-        govt_categories['EMI'].insert(0, govt_heading)
-        govt_list.append(govt_categories['EMI'])
+        govt_categories["EMI"].append(["-", "-", "-"])
+        govt_categories["EMI"].insert(0, govt_heading)
+        govt_list.append(govt_categories["EMI"])
     table_headings.append(f"EMI")
     # print(govt_categories['EMI'])
 
-    if len(govt_categories['Closure']) > 0:
-        govt_categories['Closure'].insert(0, govt_heading)
-        govt_list.append(govt_categories['Closure'])
+    if len(govt_categories["Closure"]) > 0:
+        govt_categories["Closure"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Closure"])
 
     else:
-        govt_categories['Closure'].append(["-", "-", "-"])
-        govt_categories['Closure'].insert(0, govt_heading)
-        govt_list.append(govt_categories['Closure'])
+        govt_categories["Closure"].append(["-", "-", "-"])
+        govt_categories["Closure"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Closure"])
     table_headings.append(f"Closure")
     # print(govt_categories['Closure'])
 
     govt_heading = table_lang_head[7]
 
-    if len(govt_categories['Interest']) > 0:
-        govt_categories['Interest'].insert(0, govt_heading)
-        govt_list.append(govt_categories['Interest'])
+    if len(govt_categories["Interest"]) > 0:
+        govt_categories["Interest"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Interest"])
 
     else:
-        govt_categories['Interest'].append(["-", "-", "-"])
-        govt_categories['Interest'].insert(0, govt_heading)
-        govt_list.append(govt_categories['Interest'])
+        govt_categories["Interest"].append(["-", "-", "-"])
+        govt_categories["Interest"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Interest"])
     table_headings.append(f"Interest credited and debited")
 
     if len(final) > 0 and len(govt_list) > 0:
-        create_pdf(
+        return create_pdf(
             final,
             govt_list=govt_list,
             outflow_labels=outflow_labels,

@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from processor import process_pdf
 import os
 import traceback
@@ -31,7 +31,7 @@ def upload_pdf():
         pdf_file.save(pdf_path)
 
         # Process the PDF
-        result_json = process_pdf(pdf_path, password, 'result')
+        result_json = process_pdf(pdf_path, password, "result")
         return jsonify(result_json), 200
 
     except Exception as e:
@@ -40,6 +40,7 @@ def upload_pdf():
             jsonify({"error": "An unexpected error occurred", "details": str(e)}),
             500,
         )
+
 
 @pdf_routes.route("/create-pdf", methods=["POST"])
 def upload_pdf():
@@ -53,11 +54,20 @@ def upload_pdf():
     except ValueError:
         return jsonify({"error": "Threshold and lang must be valid integers"}), 400
 
-
     # ######### Proceeding to PDF Generation ######### #
     try:
-        result = segregate(data, threshold, lang)
-        return jsonify({"message": "PDF processed successfully", "result": result}), 200
+        result_file_path = segregate(data, threshold, lang)
+
+        # ######### Proceeding to PDF Generation ######### #
+        if result_file_path and os.path.exists(result_file_path):
+            return send_file(
+                result_file_path,
+                as_attachment=True,
+                mimetype="application/pdf",
+                download_name="report.pdf",
+            )
+        else:
+            return jsonify({"error": "File generation failed"}), 500
 
     except Exception as e:
         traceback.print_exc()

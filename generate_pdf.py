@@ -412,13 +412,11 @@ def create_pdf(
         text = "macrotouch.in ________________________________________________ %d" % (
             page_num + 1
         )
-        # text = "macrotouch.in ------------------------------------------------------------------------------ %d" % (page_num + 1)
         canvas.drawString(130, 50, text)
 
     # Build the PDF
     pdf.build(elements, onFirstPage=add_page_number, onLaterPages=add_page_number)
 
-    # print(sys.path)
     pdf_files = [sys.path[0] + "/cover.pdf", pdf_path]
 
     report_dir = "Reports"
@@ -438,6 +436,4 @@ def create_pdf(
     pdf_merger.close()
     os.remove(pdf_path)
 
-
-if __name__ == "__main__":
-    create_pdf()
+    return output_file
