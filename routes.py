@@ -4,6 +4,7 @@ import os
 import traceback
 from werkzeug.utils import secure_filename
 from segregate import segregate
+import json
 
 pdf_routes = Blueprint("pdf_routes", __name__)
 
@@ -56,7 +57,9 @@ def create_pdf():
 
     # ######### Proceeding to PDF Generation ######### #
     try:
-        result_file_path = segregate(data, threshold, lang)
+        transactions = json.loads(data)
+        print(transactions, flush=True)
+        result_file_path = segregate(transactions, threshold, lang)
 
         # ######### Proceeding to PDF Generation ######### #
         if result_file_path and os.path.exists(result_file_path):
