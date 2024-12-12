@@ -415,23 +415,27 @@ def create_pdf(
     # Build the PDF
     pdf.build(elements, onFirstPage=add_page_number, onLaterPages=add_page_number)
 
-    pdf_files = [sys.path[0] + "/cover.pdf", pdf_path]
+    # pdf_files = [sys.path[0] + "/cover.pdf", pdf_path]
+    pdf_files = [os.path.join(sys.path[0], "cover.pdf"), pdf_path]
 
     report_dir = "Reports"
     os.makedirs(report_dir, exist_ok=True)
 
     report_path = "report.pdf"
-    output_pdf = os.path.join(report_dir + "/" + report_path)
+    # output_pdf = os.path.join(report_dir + "/" + report_path)
+    output_pdf = os.path.join(report_dir, report_path)
 
     pdf_merger = PyPDF2.PdfMerger()
 
     for pdf_file in pdf_files:
         pdf_merger.append(pdf_file)
 
-    with open(output_pdf, "wb") as output_file:
-        pdf_merger.write(output_file)
+    # with open(output_pdf, "wb") as output_file:
+    # pdf_merger.write(output_file)
 
+    pdf_merger.write(output_pdf)
     pdf_merger.close()
     os.remove(pdf_path)
 
-    return output_file
+    # return output_file
+    return output_pdf
