@@ -58,11 +58,12 @@ def create_pdf():
     # ######### Proceeding to PDF Generation ######### #
     try:
         transactions = json.loads(data)
-        print(transactions, flush=True)
         result_file_path = segregate(transactions, threshold, lang)
 
         # ######### Proceeding to PDF Generation ######### #
-        if result_file_path and os.path.exists(result_file_path):
+        print(result_file_path, flush=True)
+        if result_file_path:
+            # if result_file_path and os.path.exists(result_file_path):
             return send_file(
                 result_file_path,
                 as_attachment=True,
