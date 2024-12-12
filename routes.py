@@ -47,18 +47,16 @@ def create_pdf():
 
     # ######### Extract and validate parameters ######### #
     try:
-        data = request.get_json()
+        data = request.form.get("transactions", [])
+        threshold = int(request.form.get("threshold", 0))
+        lang = int(request.form.get("language", 0))
 
-        # Extract values
-        transactions = data.get("transactions")
-        threshold = data.get("threshold")
-        language = data.get("language")
+    except ValueError:
+        return jsonify({"error": "Threshold and lang must be valid integers"}), 400
 
-        if transactions is None or threshold is None or language is None:
-            return jsonify({"error": "Missing required fields"}), 400
-
-        # ######### Proceeding to PDF Generation ######### #
-        result_file_path = segregate(data, threshold, language)
+    # ######### Proceeding to PDF Generation ######### #
+    try:
+        result_file_path = segregate(data, threshold, lang)
 
         # ######### Proceeding to PDF Generation ######### #
         if result_file_path and os.path.exists(result_file_path):
