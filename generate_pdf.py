@@ -424,10 +424,7 @@ def create_pdf(
     output_pdf = os.path.join(report_dir, report_path)
 
     pdf_merger = PyPDF2.PdfMerger()
-
-    for pdf_file in pdf_files:
-        pdf_merger.append(pdf_file)
-
+    pdf_merger.append(pdf_files[0])
     pdf_merger.write(output_pdf)
     pdf_merger.close()
     os.remove(pdf_path)
