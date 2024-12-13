@@ -1,5 +1,4 @@
 import pdfplumber
-import re
 import json
 import sys
 import PyPDF2
@@ -45,7 +44,6 @@ def process_pdf(file, password, output_name):
     os.remove(decrypted_file)
 
     return extract_entries(final_data)
-    # print((segregate(extract_entries(final_data), 0, 0)))
 
 
 if __name__ == "__main__":
@@ -55,4 +53,8 @@ if __name__ == "__main__":
 
     process_pdf(file, password, output_name)
 
-# process_pdf("statements/BOB bank.pdf", '', 'report')
+# process_pdf(
+#     "statements/iob.pdf",
+#     "",
+#     "report",
+# )

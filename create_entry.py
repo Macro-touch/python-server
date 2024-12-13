@@ -17,6 +17,42 @@ def find_float(obj):
     return index
 
 
+def find_transaction_type(raw_entry, check_index) -> str:
+
+    if raw_entry.get("TYPE") is not None:
+        return raw_entry.get("TYPE")
+
+    if raw_entry.get("CR") is not None and len(raw_entry.get("CR")) > 1:
+        return "CR"
+
+    if raw_entry.get("DR") is not None and len(raw_entry.get("DR")) > 1:
+        return "DR"
+
+    if len(raw_entry) - 1 == check_index:
+        return "CR"
+
+    if (
+        raw_entry[list(raw_entry.keys())[check_index]] == "-"
+        or raw_entry[list(raw_entry.keys())[check_index]] == ""
+    ):
+        return "DR"
+
+    return ""
+
+
+def fetch_amount(raw_entry, trans_type, num_index):
+
+    amount = ""
+
+    if raw_entry.get(trans_type) is not None and len(raw_entry.get(trans_type)) > 1:
+        amount = raw_entry.get(trans_type)
+
+    else:
+        amount = raw_entry.get("AMOUNT") or raw_entry[list(raw_entry.keys())[num_index]]
+
+    return amount.replace(",", "")
+
+
 def extract_entries(data) -> list[dict]:
     data_upper = []
     entries = []
@@ -29,14 +65,13 @@ def extract_entries(data) -> list[dict]:
         data_upper.append(renewed)
 
     data = data_upper
-    for raw in data:
-        num_index = find_float(raw)
-        check_index = num_index + 1
+    for raw_entry in data:
+        num_index = find_float(raw_entry)
 
         is_date = (
-            raw[list(raw.keys())[0]]
-            if len(raw[list(raw.keys())[0]]) > 6
-            else raw[list(raw.keys())[1]]
+            raw_entry[list(raw_entry.keys())[0]]
+            if len(raw_entry[list(raw_entry.keys())[0]]) > 6
+            else raw_entry[list(raw_entry.keys())[1]]
         )
 
         date = (
@@ -52,24 +87,13 @@ def extract_entries(data) -> list[dict]:
 
         if len(date) > 2 and bool(alpha_pattern.search(date)):
             desc = r"" + (
-                    raw.get("PARTICULARS") or raw.get("DESCRIPTION") or raw.get("NARRATION")
+                raw_entry.get("PARTICULARS")
+                or raw_entry.get("DESCRIPTION")
+                or raw_entry.get("NARRATION")
             ).replace("\n", "")
 
-            trans_type = raw.get("TYPE") or (
-                "CR"
-                if len(raw) - 1 == check_index
-                else ("DR" if raw[list(raw.keys())[check_index]] == "-" else "CR")
-            )
-
-            trans_type = (
-                "DR"
-                if trans_type == "Debit"
-                else "CR" if trans_type == "Credit" else trans_type
-            )
-
-            amount = (raw.get("AMOUNT") or raw[list(raw.keys())[num_index]]).replace(
-                ",", ""
-            )
+            trans_type = find_transaction_type(raw_entry, num_index + 1)
+            amount = fetch_amount(raw_entry, trans_type, num_index)
 
             entry = {
                 "date": date,
