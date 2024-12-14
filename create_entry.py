@@ -20,7 +20,10 @@ def find_float(obj):
 def find_transaction_type(raw_entry, check_index) -> str:
 
     if raw_entry.get("TYPE") is not None:
-        return raw_entry.get("TYPE")
+        if len(raw_entry.get("TYPE")) == 2:
+            return raw_entry.get("TYPE")
+        else:
+            return "DR" if str(raw_entry.get("TYPE")).lower() == "debit" else "CR"
 
     if raw_entry.get("CR") is not None and len(raw_entry.get("CR")) > 1:
         return "CR"
