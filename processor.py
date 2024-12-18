@@ -30,10 +30,10 @@ def extract_data(pdf_path):
         # with_breaker(pdf)
         # without_breaker(pdf)
 
+        table_data = with_breaker(pdf)
+
         table_data = (
-            with_breaker(pdf)
-            if json.dumps(with_breaker(pdf)) != "[]"
-            else without_breaker(pdf)
+            table_data if json.dumps(table_data) != "[]" else without_breaker(pdf)
         )
 
         return table_data

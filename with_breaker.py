@@ -8,8 +8,14 @@ def with_breaker(pdf):
     for page in pdf.pages:
         rows = page.extract_table()
 
+        # checking if the pdf does not contain row or col
         if rows:
-            tables.extend(rows)
+            for row in rows:
+                for cell in row:
+                    if cell is not None and cell.count("\n") > 3:
+                        return []
+
+        tables.extend(rows)
 
     if tables:
         headers = tables[0]
