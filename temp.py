@@ -1,500 +1,120 @@
-# segregate.py
-
-import re
+from data import MONTHS, lang_heading
+from desc_classifier import DescriptionClassifier
+from keyword_checker import KeywordChecker
 from generate_pdf import create_pdf
 
-MONTHS = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-]
 
-
-def contains_non_alphabet_substring(input_string):
-    charge_keyword = [
-        "CHARGES",
-        "CHG",
-        "BG CHARGES",
-        "CHRGS",
-        "FEE",
-        "MISC",
-        "MISC-REMIT",
-        "BULK",
-    ]
-
-    for substring in charge_keyword:
-        pattern = re.compile(
-            rf"(?<![a-zA-Z]){re.escape(substring)}(?![a-zA-Z])", re.IGNORECASE
-        )
-        if pattern.search(input_string):
-            return substring
-    return None
-
-
-keywords = [
-    "tax",
-    "ibrtgs",
-    "ACCOUNT",
-    "neft",
-    "upi",
-    "imps",
-    "chq",
-    "rtgs",
-    "atm",
-    "coll",
-    "vps",
-    "transfer",
-    "paytm",
-    "transferee",
-    "to",
-    "from",
-    "by",
-    "depo",
-    "clearing",
-    "withdrawal",
-    "NEWCARDISSUE",
-    "impbill",
-    "trf",
-    "payment",
-    "chrgs",
-    "remit",
-    "bank",
-    "atm",
-    "ecom",
-    "pos",
-    "apbs",
-    "chg",
-    "cash",
-    "cheque",
-    "dd",
-    "eft",
-    "swift",
-    "web",
-    "net",
-    "liq",
-    "mobile",
-    "tfr",
-    "wdl",
-    "dep",
-    "deposit",
-    "tds",
-    "grant",
-    "emi",
-    "inst",
-    "installment",
-    "int",
-    "interest",
-    "pf",
-    "pension",
-    "deposit",
-    "closure",
-    "terminated",
-    "ins",
-    "insurance",
-    "refund",
-    "advtax",
-    "advancetax",
-    "bill",
-]
-keyword_list = "|".join(keywords)
-key_pattern = re.compile(r"\b(?:" + keyword_list + r")\b", flags=re.IGNORECASE)
-attr_desc = []
-
-deduct_keywords = [
-    "INS",
-    "INSURANCE",
-    "LIFE",
-    "HEALTH",
-    "PROVI",
-    "FUND",
-    "PF",
-    "PF",
-    "SCHL",
-    "SCHOOL",
-    "CLG",
-    "COLLEGE",
-    "UNIVERSITY",
-    "EDUCATIONAL INSTITUTE",
-    "EDU INST",
-    "STAMP DUTY",
-    "REGISTRATION FEES",
-    "STAMP",
-    "REGISTRAR OFFICE",
-    "PENSION",
-    "MONEY",
-    "MUTUAL",
-    "FUND",
-    "ASSET",
-    "FINAN",
-    "LIFE",
-    "MEDI",
-    "HOSP",
-    "HOSPITAL",
-    "CHECKUP",
-    "BODYCHECKUP",
-    "SCAN",
-    "INT",
-    "EDU",
-    "FINAN",
-    "INSTITU",
-    "CHARITAB",
-    "DONATION",
-    "DONA",
-    "TRUST",
-    "HOME",
-    "RENT",
-    "INT",
-    "HOUSE LOAN",
-    "INTEREST",
-    "INTREST",
-    "ELECTRIC",
-    "VEHICLE",
-    "POLITICAL",
-    "PARTY",
-]
-deduct_keyword_list = "|".join(deduct_keywords)
-deduct_key_pattern = re.compile(
-    r"\b(?:" + deduct_keyword_list + r")\b", flags=re.IGNORECASE
-)
-
-isDate = ""
-
-
-def contains_keyword(string):
-    result = key_pattern.search(string)
-    if not bool(result):
-        attr_desc.append(string)
-
-
-def find_float(obj):
-    index = 0
-    for key, value in obj.items():
-        try:
-            float_value = float(value.replace(",", ""))
-
-            if index != 0 and isinstance(float_value, float):
-                return index
-
-        except ValueError:
-            pass
-
-        index += 1
-    return index
-
-
-lang_heading = {
-    0: [
-        ["Date", "Decription", "Amount", "Type"],
-        ["Particular", "Count", "Amount INFLOW", "Amount OUTFLOW"],
-        ["Date", "Decription", "Amount INFLOW", "Amount OUTFLOW"],
-        ["Date", "Decription", "Amount", "Type"],
-        ["Date", "Decription", "Amount", "Type"],
-        ["Description", "Debit", "Credit"],
-        ["Date", "Decription", "Amount"],
-        ["Date", "Decription", "IN", "OUT"],
-    ],
-    1: [
-        ["தேதி", "விளக்கம்", "தொகை", "வகை"],
-        ["விளக்கம்", "எண்ணிக்கை", "வரவுத்தொகை", "செலவுத்தொகை"],
-        ["தேதி", "விளக்கம்", "வரவுத்தொகை", "செலவுத்தொகை"],
-        ["தேதி", "விளக்கம்", "தொகை", "வகை"],
-        ["தேதி", "விளக்கம்", "தொகை", "வகை"],
-        ["விளக்கம்", "செலவு", "வரவு"],
-    ],
-    2: [
-        ["തീയതി", "വിവരണം", "തുക", "തരം"],
-        ["വിവരണം", "എണ്ണുക", "തുകയുടെ വരവ്", "തുക പുറത്തേക്ക് ഒഴുകുന്നു"],
-        ["തീയതി", "വിവരണം", "തുകയുടെ വരവ്", "തുക പുറത്തേക്ക് ഒഴുകുന്നു"],
-        ["തീയതി", "വിവരണം", "തുക", "തരം"],
-        ["തീയതി", "വിവരണം", "തുക", "തരം"],
-        ["വിവരണം", "ഡെബിറ്റ്", "കടപ്പാട്"],
-    ],
-    3: [
-        ["తేదీ", "వివరణ", "మొత్తం", "రకము"],
-        ["వివరణ", "లెక్కించు", "ఇన్‌ఫ్లో మొత్తం", "అవుట్‌ఫ్లో మొత్తం"],
-        ["తేదీ", "వివరణ", "ఇన్‌ఫ్లో మొత్తం", "అవుట్‌ఫ్లో మొత్తం"],
-        ["తేదీ", "వివరణ", "మొత్తం", "రకము"],
-        ["తేదీ", "వివరణ", "మొత్తం", "రకము"],
-        ["వివరణ", "డెబిట్", "క్రెడిట్"],
-    ],
-    4: [
-        ["तारीख", "विवरण", "मात्रा", "प्रकार"],
-        ["विवरण", "गणना", "राशि का प्रवाह", "राशि का बहिर्प्रवाह"],
-        ["तारीख", "विवरण", "राशि का प्रवाह", "राशि का बहिर्प्रवाह"],
-        ["तारीख", "विवरण", "मात्रा", "प्रकार"],
-        ["तारीख", "विवरण", "मात्रा", "प्रकार"],
-        ["विवरण", "नामे", "श्रेय"],
-    ],
-}
-
-
-def segregate(data, threshold: int, current_lang: int):
-
-    result = []
-    charges = []
+def segregate(data: list[dict], threshold: int, lang: int):
     m_o_p = {}
-    high_value_transaction = {"inflow": [], "outflow": []}
-
+    charges = []
     hvt_list = []
     final = []
     table_headings = []
     attr_result = []
-
-    tds = []
-    grant = []
     deduction = []
-    tax_refund = []
-    ad_tax = []
-    emi_list = []
-    closure_list = []
-    interest_list = []
+
+    govt_categories = {
+        "TDS": [],
+        "Grant": [],
+        "Tax Refund": [],
+        "Advance Tax": [],
+        "EMI": [],
+        "Closure": [],
+        "Interest": [],
+    }
 
     outflow_labels = []
     inflow_labels = []
 
     total_income = [0, 0]
     total_outcome = [0, 0]
-    table_lang_head = lang_heading[current_lang]
+    table_lang_head = lang_heading[lang]
 
-    new_list = []
-    for input_dict in data:
-        renewed = {
-            key.upper(): "-" if value == None else value
-            for key, value in input_dict.items()
-        }
-        new_list.append(renewed)
+    for entry in data:
+        date = entry.get("date")
+        desc = entry.get("description")
+        amount = entry.get("amount")
+        trans_type = entry.get("type")
 
-    data = new_list
-
-    for raw in data:
-        num_index = find_float(raw)
-        check_index = num_index + 1
-
-        isDate = (
-            raw[list(raw.keys())[0]]
-            if len(raw[list(raw.keys())[0]]) > 6
-            else raw[list(raw.keys())[1]]
-        )
-
-        date = (
-            (
-                isDate.split("\n")[0]
-                if len(isDate.split("\n")[1]) > 4
-                else isDate.replace("\n", "")
-            )
-            if len(isDate.split("\n")) > 1
-            else isDate
-        )
-        alpha_pattern = re.compile(r"\d+")
-
-        if len(date) > 2 and bool(alpha_pattern.search(date)):
-            desc = r"" + (
-                raw.get("PARTICULARS") or raw.get("DESCRIPTION") or raw.get("NARRATION")
-            ).replace("\n", "")
-
-            transc_type = raw.get("TYPE") or (
-                "CR"
-                if len(raw) - 1 == check_index
-                else ("DR" if raw[list(raw.keys())[check_index]] == "-" else "CR")
-            )
-
-            transc_type = (
-                "DR"
-                if transc_type == "Debit"
-                else "CR" if transc_type == "Credit" else transc_type
-            )
-
-            amount = (raw.get("AMOUNT") or raw[list(raw.keys())[num_index]]).replace(
-                ",", ""
-            )
-
-            entry = {
-                "date": date,
-                "description": desc,
-                "type": transc_type,
-                "amount": amount,
-            }
-
-            # print(entry)
-
-            pattern = re.compile(
-                r"(?=.*[a-zA-Z]{3,})(?=.*\d{3,})[a-zA-Z\d.]+@[a-zA-Z]{3,}"
-            )
-            match = re.findall(pattern, desc)
-
-            if match == []:
-                pattern = re.compile(r"\b[a-zA-Z@\s]{6,}\d*\b")
-                match = re.findall(pattern, desc)
-
-            if len(match) > 0 and "WITHDRAWAL TRANSFER" in match[0]:
-                attr_desc.append(match[0].replace("WITHDRAWAL TRANSFER ", ""))
-
-            else:
-                for string in match:
-                    pattern_result = key_pattern.search(string)
-                    if not bool(pattern_result):
-                        # print(string)
-                        attr_desc.append(string)
-
-            if attr_desc:
-                new_attr_entry = {
-                    "DATE": date,
-                    "DESCRIPTION": str(attr_desc[0]),
-                    "AMOUNT": amount,
-                    "TYPE": transc_type,
-                }
-
-                if (
-                    (len(date) > 1)
-                    and (len(str(attr_desc[0])) > 1)
-                    and (len(amount) > 1)
-                    and (len(transc_type) > 1)
-                ):
-                    attr_result.append(new_attr_entry)
-
-            else:
-                # if none returned
-                pass
-
-            attr_desc.clear()
-
+        # ############# Checking whether the entry comes under attribute classification ############# #
+        checker = KeywordChecker(desc)
+        classifier = DescriptionClassifier(desc)
+        desc_attribute = checker.contains_keyword()
+        if bool(desc_attribute):
             if (
                 (len(date) > 1)
-                and (len(desc) > 1)
+                and (len(desc_attribute) > 1)
                 and (len(amount) > 1)
-                and (len(transc_type) > 1)
+                and (len(trans_type) > 1)
             ):
-                result.append(entry)
+                attr_entry = {
+                    "date": date,
+                    "description": desc_attribute,
+                    "amount": amount,
+                    "type": trans_type,
+                }
+                attr_result.append(attr_entry)
+        else:
+            pass
+        # ############# Checking whether the entry comes under attribute classification ############# #
 
-            temp_desc = desc.upper()
+        # ############# Checking whether the entry comes charges ############# #
+        charge_result = checker.contains_non_alphabet_substring()
+        if bool(charge_result):
+            charges.append(entry)
+        # ############# Checking whether the entry comes under charges ############# #
 
-            # Totals
-            if transc_type == "DR":
-                total_income[0] += float(amount)
-                total_income[1] += 1
+        # ############# Total income outcome ############# #
+        if trans_type == "DR":
+            total_income[0] += float(amount)
+            total_income[1] += 1
 
-            if transc_type == "CR":
-                total_outcome[0] += float(amount)
-                total_outcome[1] += 1
+        if trans_type == "CR":
+            total_outcome[0] += float(amount)
+            total_outcome[1] += 1
+        # ############# Total income outcome ############# #
 
-            charg_result = contains_non_alphabet_substring(temp_desc)
-            if bool(charg_result):
-                charges.append(entry)
+        # ############# Verifying Mode of payments ############# #
+        mode = classifier.mode_of_payment_finder()
+        if mode:
+            m_o_p.setdefault(mode, []).append(entry)
+        # ############# Verifying Mode of payments ############# #
 
-            mode = None
-            if re.search(r"UPI.*?(?=\s|$)", temp_desc):
-                mode = "UPI"
-            elif re.search(r"IMPS.*?(?=\s|$)", temp_desc):
-                mode = "IMPS"
-            elif re.search(r"NEFT.*?(?=\s|$)", temp_desc):
-                mode = "NEFT"
-            elif re.search(r"CHQ.*?(?=\s|$)", temp_desc):
-                mode = "CHQ"
-            elif re.search(r"RTGS.*?(?=\s|$)", temp_desc) or re.search(
-                r"RTG.*?(?=\s|$)", temp_desc
-            ):
-                mode = "RTGS"
+        # ############# Validating Deductions ############# #
+        sub_entry = [entry["date"], entry["description"], entry["amount"]]
+        is_deduction = checker.deduction_checker()
+        if bool(is_deduction):
+            deduction.append(sub_entry)
+        # ############# Validating Deductions ############# #
 
-            if mode and mode not in m_o_p:
-                m_o_p[mode] = []
-            if mode:
-                m_o_p[mode].append(entry)
+        # ############# Extracting Govt. Lists ############# #
+        classifier.categorize_govt_entry(sub_entry, entry["type"], govt_categories)
+        # ############# Extracting Deductions ############# #
 
-            sub_entry = [entry["DATE"], entry["DESCRIPTION"], entry["AMOUNT"]]
-
-            ded_pattern_result = deduct_key_pattern.search(temp_desc)
-            if bool(ded_pattern_result):
-                deduction.append(sub_entry)
-
-            # TDS
-            if "TDS" in temp_desc:
-                tds.append(sub_entry)
-
-            elif "GRANT" in temp_desc:
-                grant.append(sub_entry)
-
-            elif "REFUND" in temp_desc or "TAXDEPARTMENT" in temp_desc:
-                tax_refund.append(sub_entry)
-
-            elif (
-                "ADVTAX" in temp_desc
-                or "ADVANCETAX" in temp_desc
-                or "PAID" in temp_desc
-                or "ADVANCETAX" in temp_desc
-            ):
-                ad_tax.append(sub_entry)
-
-            elif (
-                "EMI" in temp_desc
-                or "INST" in temp_desc
-                or "INSTALLMENT" in temp_desc
-                or "INSTALMENT" in temp_desc
-            ):
-                emi_list.append(sub_entry)
-
-            elif (
-                "PF CLOSURE" in temp_desc
-                or "PENSION CLOSURE" in temp_desc
-                or "DEPOSIT CLOSURE" in temp_desc
-                or "CLOSURE" in temp_desc
-                or "TERMINATED" in temp_desc
-            ):
-                closure_list.append(sub_entry)
-
-            elif (
-                "INT" in temp_desc
-                or "INTEREST" in temp_desc
-                or "INT RECEIVED" in temp_desc
-                or "INTEREST RECEIVED" in temp_desc
-            ):
-                new_interest = [
-                    entry["DATE"],
-                    desc,
-                    entry["AMOUNT"] if entry["TYPE"] == "DR" else 0,
-                    entry["AMOUNT"] if entry["TYPE"] == "CR" else 0,
-                ]
-
-                interest_list.append(new_interest)
-
-            # High Value Transaction
-            if (float(amount) > float(threshold)) and float(threshold) > 0:
-                if transc_type == "CR":
-                    high_value_transaction["inflow"].append(sub_entry)
-                elif transc_type == "DR":
-                    high_value_transaction["outflow"].append(sub_entry)
-
-                new_hvt = [
-                    date,
-                    desc,
-                    amount if transc_type == "CR" else "-",
-                    amount if transc_type == "DR" else "-",
-                ]
-                hvt_list.append(new_hvt)
-
-    # print(hvt_list)
+        # ############# Validating High Value Transaction ############# #
+        if float(threshold) > 0 and (float(amount) > float(threshold)):
+            new_hvt = [
+                date,
+                desc,
+                amount if trans_type == "CR" else "-",
+                amount if trans_type == "DR" else "-",
+            ]
+            hvt_list.append(new_hvt)
+        # ############# Validating High Value Transaction ############# #
 
     # Unusual Transaction
     date = ""
     desc_amount_type = {}
     first_date_value = dict
 
-    unsual_list = []
+    unusual_list = []
     duplicate_list = []
 
     for d in attr_result:
-        current_date = d["DATE"]
-        current_desc = d["DESCRIPTION"]
-        current_amount = d["AMOUNT"]
-        current_type = d["TYPE"]
+        current_date = d["date"]
+        current_desc = d["description"]
+        current_amount = d["amount"]
+        current_type = d["type"]
 
         combined_text = str(current_desc) + "/" + str(current_amount)
 
@@ -512,12 +132,12 @@ def segregate(data, threshold: int, current_lang: int):
                 if desc_amount_type[combined_text] != current_type:
 
                     # adding the first value after checking <=
-                    if first_date_value not in unsual_list:
-                        unsual_list.append(first_date_value)
+                    if first_date_value not in unusual_list:
+                        unusual_list.append(first_date_value)
 
                     # avoiding duplicate values.
-                    if d not in unsual_list:
-                        unsual_list.append(d)
+                    if d not in unusual_list:
+                        unusual_list.append(d)
                     # final.append(d)
 
                 else:
@@ -536,36 +156,33 @@ def segregate(data, threshold: int, current_lang: int):
 
     # Bank Charges
     charge_list = [list(obj.values())[:-1] + ["Bank Charges"] for obj in charges]
-    # charge_header = ['Date', 'Decription', 'Amount', 'Type']
     charge_header = table_lang_head[0]
     if len(charge_list) > 0:
         charge_list.insert(0, charge_header)
-        final.append(charge_list)
     else:
         charge_list.append(["-", "- ", "- ", "-"])
         charge_list.insert(0, charge_header)
-        final.append(charge_list)
 
+    final.append(charge_list)
     table_headings.append("Bank Charges Analysis")
 
     # Mode Of Payment
     mode_list = []
     for key, value in m_o_p.items():
         d_imps = sum(
-            float(obj["AMOUNT"].replace(",", ""))
+            float(obj["amount"].replace(",", ""))
             for obj in value
-            if obj["TYPE"] == "DR" and float(obj["AMOUNT"].replace(",", "")) > 0
+            if obj["type"] == "DR" and float(obj["amount"].replace(",", "")) > 0
         )
         c_imps = sum(
-            float(obj["AMOUNT"].replace(",", ""))
+            float(obj["amount"].replace(",", ""))
             for obj in value
-            if obj["TYPE"] == "CR" and float(obj["AMOUNT"].replace(",", "")) > 0
+            if obj["type"] == "CR" and float(obj["amount"].replace(",", "")) > 0
         )
         mode_list.append(
             [key, str(len(value)), "{:.2f}".format(d_imps), "{:.2f}".format(c_imps)]
         )
 
-    # mode_header = ['Particular', 'Count', 'Amount INFLOW' , 'Amount OUTFLOW']
     mode_header = table_lang_head[1]
     if len(mode_list) > 0:
         mode_list.insert(0, mode_header)
@@ -591,7 +208,7 @@ def segregate(data, threshold: int, current_lang: int):
     table_headings.append(f"High Value Transactions")
 
     # Unusual Transactions
-    unusual_trans_list = [list(my_dict.values()) for my_dict in unsual_list]
+    unusual_trans_list = [list(my_dict.values()) for my_dict in unusual_list]
     unusual_header = table_lang_head[3]
     # unusual_header = ['Date', 'Decription', 'Amount', 'Type']
     if len(unusual_trans_list) > 0:
@@ -607,7 +224,7 @@ def segregate(data, threshold: int, current_lang: int):
 
     duplicates = [list(my_dict.values()) for my_dict in duplicate_list]
     dup_header = table_lang_head[4]
-    # dup_header = ['Date', 'Decription', 'Amount', 'Type']
+    # dup_header = ['Date', 'Description', 'Amount', 'Type']
 
     if len(duplicates) > 0:
         duplicates.insert(0, dup_header)
@@ -632,10 +249,10 @@ def segregate(data, threshold: int, current_lang: int):
 
     for my_dict in attr_result:
 
-        # --------------- Attr. Classftn. --------------- #
-        description_value = my_dict["DESCRIPTION"]
-        amount_value = float(my_dict["AMOUNT"].replace(",", ""))
-        transaction_type = my_dict["TYPE"]
+        # --------------- Attr. Classification. --------------- #
+        description_value = my_dict["description"]
+        amount_value = float(my_dict["amount"].replace(",", ""))
+        transaction_type = my_dict["type"]
 
         # Initialize count and sum if the 'Description' is not seen before
         if description_value not in description_stats:
@@ -685,9 +302,9 @@ def segregate(data, threshold: int, current_lang: int):
 
         max_amount = amount_value if amount_value > max_amount else max_amount
 
-        if my_dict["TYPE"] == "Debit":
+        if my_dict["type"] == "DR":
             graph_dots.append((0, amount_value))
-        if my_dict["TYPE"] == "Credit":
+        if my_dict["type"] == "CR":
             graph_dots.append((amount_value, 0))
 
     attributes_list = [
@@ -733,27 +350,27 @@ def segregate(data, threshold: int, current_lang: int):
 
     # TDS
     govt_heading = table_lang_head[6]
-    if len(tds) > 0:
-        tds.insert(0, govt_heading)
-        govt_list.append(tds)
+    if len(govt_categories["TDS"]) > 0:
+        govt_categories["TDS"].insert(0, govt_heading)
+        govt_list.append(govt_categories["TDS"])
 
     else:
-        tds.append(["-", "-", "-"])
-        tds.insert(0, govt_heading)
-        govt_list.append(tds)
+        govt_categories["TDS"].append(["-", "-", "-"])
+        govt_categories["TDS"].insert(0, govt_heading)
+        govt_list.append(govt_categories["TDS"])
     table_headings.append(f"List of TDS detucted")
-    # print(tds)
+    # print(govt_categories['TDS'])
 
-    if len(grant) > 0:
-        grant.insert(0, govt_heading)
-        govt_list.append(grant)
+    if len(govt_categories["Grant"]) > 0:
+        govt_categories["Grant"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Grant"])
 
     else:
-        grant.append(["-", "-", "-"])
-        grant.insert(0, govt_heading)
-        govt_list.append(grant)
+        govt_categories["Grant"].append(["-", "-", "-"])
+        govt_categories["Grant"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Grant"])
     table_headings.append(f"Recepit of Government Grant")
-    # print(grant)
+    # print(govt_categories['Grant'])
 
     if len(deduction) > 0:
         deduction.insert(0, govt_heading)
@@ -766,212 +383,72 @@ def segregate(data, threshold: int, current_lang: int):
     table_headings.append(f"Deduction")
     # print(deduction)
 
-    if len(tax_refund) > 0:
-        tax_refund.insert(0, govt_heading)
-        govt_list.append(tax_refund)
+    if len(govt_categories["Tax Refund"]) > 0:
+        govt_categories["Tax Refund"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Tax Refund"])
 
     else:
-        tax_refund.append(["-", "-", "-"])
-        tax_refund.insert(0, govt_heading)
-        govt_list.append(tax_refund)
+        govt_categories["Tax Refund"].append(["-", "-", "-"])
+        govt_categories["Tax Refund"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Tax Refund"])
     table_headings.append(f"Tax Refund")
-    # print(tax_refund)
+    # print(govt_categories['Tax Refund'])
 
-    if len(ad_tax) > 0:
-        ad_tax.insert(0, govt_heading)
-        govt_list.append(ad_tax)
+    if len(govt_categories["Advance Tax"]) > 0:
+        govt_categories["Advance Tax"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Advance Tax"])
 
     else:
-        ad_tax.append(["-", "-", "-"])
-        ad_tax.insert(0, govt_heading)
-        govt_list.append(ad_tax)
+        govt_categories["Advance Tax"].append(["-", "-", "-"])
+        govt_categories["Advance Tax"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Advance Tax"])
     table_headings.append(f"Advance tax")
-    # print(ad_tax)
+    # print(govt_categories['Advance Tax'])
 
-    if len(emi_list) > 0:
-        emi_list.insert(0, govt_heading)
-        govt_list.append(emi_list)
+    if len(govt_categories["EMI"]) > 0:
+        govt_categories["EMI"].insert(0, govt_heading)
+        govt_list.append(govt_categories["EMI"])
 
     else:
-        emi_list.append(["-", "-", "-"])
-        emi_list.insert(0, govt_heading)
-        govt_list.append(emi_list)
+        govt_categories["EMI"].append(["-", "-", "-"])
+        govt_categories["EMI"].insert(0, govt_heading)
+        govt_list.append(govt_categories["EMI"])
     table_headings.append(f"EMI")
-    # print(emi_list)
+    # print(govt_categories['EMI'])
 
-    if len(closure_list) > 0:
-        closure_list.insert(0, govt_heading)
-        govt_list.append(closure_list)
+    if len(govt_categories["Closure"]) > 0:
+        govt_categories["Closure"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Closure"])
 
     else:
-        closure_list.append(["-", "-", "-"])
-        closure_list.insert(0, govt_heading)
-        govt_list.append(closure_list)
+        govt_categories["Closure"].append(["-", "-", "-"])
+        govt_categories["Closure"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Closure"])
     table_headings.append(f"Closure")
-    # print(closure_list)
+    # print(govt_categories['Closure'])
 
     govt_heading = table_lang_head[7]
 
-    if len(interest_list) > 0:
-        interest_list.insert(0, govt_heading)
-        govt_list.append(interest_list)
+    if len(govt_categories["Interest"]) > 0:
+        govt_categories["Interest"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Interest"])
 
     else:
-        interest_list.append(["-", "-", "-"])
-        interest_list.insert(0, govt_heading)
-        govt_list.append(interest_list)
+        govt_categories["Interest"].append(["-", "-", "-"])
+        govt_categories["Interest"].insert(0, govt_heading)
+        govt_list.append(govt_categories["Interest"])
     table_headings.append(f"Interest credited and debited")
 
     if len(final) > 0 and len(govt_list) > 0:
-
-        return result
-
-        # return {
-        #     "data": final,
-        #     "govt_list": govt_list,
-        #     "outflow_labels": outflow_labels,
-        #     "inflow_labels": inflow_labels,
-        #     "lang": current_lang,
-        #     "table_headings": table_headings,
-        #     "chart_data": chart_data,
-        #     "total_income": total_income,
-        #     "total_outcome": total_outcome,
-        #     "line_chart_data": [date_data, graph_months],
-        # }
-
-        # create(
-        #     final,
-        #     govt_list=govt_list,
-        #     outflow_labels=outflow_labels,
-        #     inflow_labels=inflow_labels,
-        #     current_lang=current_lang,
-        #     table_headings=table_headings,
-        #     chart_data=chart_data,
-        #     total_income=total_income,
-        #     total_outcome=total_outcome,
-        #     line_chart_data=[date_data, graph_months],
-        # )
-
-
-if __name__ == "__main__":
-    segregate([], 0, 0)
-
-
-# Define global variables or constants
-decimal_pattern = re.compile(r"[\d,]+\.\d{2}")
-new_line_patterns = [
-    re.compile(
-        r"(\b\d{2}/\d{2}/\d{2}\b) ([a-zA-Z0-9\-@#*/.]+)\s+([a-zA-Z0-9]+)\s+(\b\d{2}/\d{2}/\d{2}\b) (?:(\s|[\d,]+\.\d{2})) ?(?:(\s|[\d,]+\.\d{2}))?\s([\d,]+\.\d{2})"
-    ),
-    re.compile(
-        r"(\b\d{2}-[A-Z]{3}-\d{4}\b) (\b\d{2}-[A-Z]{3}-\d{4}\b) ([A-Za-z0-9/.-]+) ([A-Za-z0-9]+) (\d+\.\d{2}) (\d+,\d+\.\d{2}) (\d+,\d+\.\d{2})"
-    ),
-]
-contains_new_line = re.compile(r"^\d+(\.\d*)?\n(?:[a-zA-Z]{0,2}|\d+)$")
-date_pattern = re.compile(r"(\b\d{2}/\d{2}/\d{2}\b)")
-
-
-def find_text_position(value, page_num, pdf, texts):
-    page = pdf.pages[page_num]
-    raw_text = page.extract_words()
-    rvalue = [item for item in raw_text if item.get("text") == value]
-
-    # print(raw_text)
-
-    if len(rvalue) > 1:
-
-        if len(texts) == 0:
-            texts.append(value)
-
-        elif len(texts) != 0:
-            if value not in texts:
-                texts = []
-            texts.append(value)
-
-        return [rvalue[len(texts) - 1]]
-
-    return [item for item in raw_text if item.get("text") == value] if rvalue else None
-
-def with_breaker_(pdf):
-    tables = []
-    for page in pdf.pages:
-        rows = page.extract_table()
-
-        if rows:
-            tables.extend(rows)
-
-    if tables:
-        headers = tables[0]
-        table_data = [
-            {
-                headers[col]: (
-                    float(val)
-                    if val.isdigit()
-                    else (
-                        val.split("\n")[0]
-                        if bool(contains_new_line.match(val))
-                        else val
-                    )
-                )
-                for col, val in enumerate(row)
-                if headers[col]
-            }
-            for row in tables[1:]
-        ]
-
-        return table_data
-
-    return []
-
-def without_breaker_(pdf):
-    final = []
-    texts = []  # Initialize texts here, if needed across multiple pages
-    for page_num, page in enumerate(pdf.pages):
-        entry_dict = {}
-        combined_text = combine_text_lines(page.extract_text())
-
-        for line in combined_text.split("\n"):
-            trimmed = line.split(" ")[:7]
-            if len(trimmed) > 1:
-                entry = trimmed
-                entry_dict["Date"] = entry[0]
-                entry_dict["Description"] = (
-                    entry[1] + entry[-1] if len(entry) == 7 else entry[1]
-                )
-                found = find_text_position(entry[4], page_num, pdf, texts)
-                if found:
-                    pos = found[0]["x1"]
-                    entry_dict["Amount"] = found[0]["text"].replace(",", "")
-                    entry_dict["Type"] = "CR" if pos == 548.187 else "DR"
-                entry_dict["Closing Balance"] = entry[5].replace(",", "")
-                final.append(entry_dict.copy())
-
-    return final
-
-def combine_text_lines(text):
-    combined_text = ""
-    condition_met = False
-
-    for line in text.split("\n"):
-        match_found = False
-        print(line)
-        # Check each pattern to see if it matches the line
-        for pattern in new_line_patterns:
-            if pattern.match(line):
-                match_found = True
-                condition_met = True
-                # Add line with newline if it ends with a decimal, otherwise append to the previous line
-                combined_text += (
-                    f"\n{line}"
-                    if decimal_pattern.search(line.split()[-1])
-                    else f" {line}"
-                )
-                break
-
-        # For unmatched lines after the condition has been met
-        if not match_found and condition_met:
-            # Continue appending if line does not end with a decimal
-            if not decimal_pattern.search(line.split()[-1]):
-                combined_text += f" {line}"
-
-    return combined_text
+        return create_pdf(
+            final,
+            govt_list=govt_list,
+            outflow_labels=outflow_labels,
+            inflow_labels=inflow_labels,
+            current_lang=lang,
+            table_headings=table_headings,
+            chart_data=chart_data,
+            total_income=total_income,
+            total_outcome=total_outcome,
+            line_chart_data=[date_data, graph_months],
+        )

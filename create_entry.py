@@ -1,5 +1,7 @@
 import re
 
+from functions.extract_attribute import extract_attribute
+
 
 def find_float(obj):
     index = 0
@@ -97,12 +99,14 @@ def extract_entries(data) -> list[dict]:
 
             trans_type = find_transaction_type(raw_entry, num_index + 1)
             amount = fetch_amount(raw_entry, trans_type, num_index)
+            attribute = extract_attribute(desc, trans_type)
 
             entry = {
                 "date": date,
                 "description": desc,
                 "type": trans_type,
                 "amount": amount,
+                "attribute": attribute,
             }
             entries.append(entry)
 
