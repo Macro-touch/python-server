@@ -5,7 +5,6 @@ import PyPDF2
 import os
 
 from create_entry import extract_entries
-from segregate import segregate
 from without_breaker import without_breaker
 from with_breaker import with_breaker
 
@@ -44,7 +43,7 @@ def process_pdf(file, password, output_name):
     final_data = extract_data(decrypted_file)
     os.remove(decrypted_file)
 
-    # extract_entries(final_data)
+    # segregate(extract_entries(final_data), 0, 0)
     return extract_entries(final_data)
 
 
@@ -56,7 +55,7 @@ if __name__ == "__main__":
     process_pdf(file, password, output_name)
 
 # process_pdf(
-#     "statements/BOB bank.pdf",
+#     "statements/~hdfc.pdf",
 #     "",
 #     "report",
 # )

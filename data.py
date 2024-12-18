@@ -234,7 +234,21 @@ deduct_dict = {
     "80ggb": ["POLITICAL", "PARTY"],
 }
 
-lang_heading = {
+table_headings = {
+    "eng": {
+        "CHG": ["Date", "Description", "Amount", "Type", "Details"],
+        "MOP": ["Particular", "Count", "Amount INFLOW", "Amount OUTFLOW"],
+        "HVT": ["Date", "Decription", "Amount INFLOW", "Amount OUTFLOW"],
+        "UNT": ["Date", "Decription", "Amount", "Type"],
+        "ATTR": ["Description", "Debit", "Credit"],
+        "GOV": ["Date", "Decription", "Amount"],
+        "DED": ["Date", "Decription", "Amount", "Section"],
+        "INT": ["Date", "Decription", "OUT", "IN"],
+        "CLS": ["Particular", "Debit", "Credit"],
+    }
+}
+
+table_heading = {
     0: [
         ["Date", "Decription", "Amount", "Type"],
         ["Particular", "Count", "Amount INFLOW", "Amount OUTFLOW"],

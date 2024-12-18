@@ -200,9 +200,9 @@ def create_entry(row: List[str], indices: dict) -> dict:
         "date": row[indices.get("date")],
         "description": row[indices.get("description")],
         "type": (
-            row[indices.get("cr/dr")]
+            row[indices.get("cr/dr")].upper()
             if indices.get("cr/dr")
-            else ("cr" if is_valid_amount(row[indices.get("credit")]) else "dr")
+            else ("CR" if is_valid_amount(row[indices.get("credit")]) else "DR")
         ),
         "amount": (
             row[indices.get("amount")]

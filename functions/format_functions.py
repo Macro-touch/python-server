@@ -6,36 +6,62 @@ from data import MONTHS
 def ded_section(input_string: str):
 
     # best cases first:
-    if input_string == 'PENSION':
-        return '80cc'
-    elif input_string == 'ELECTRIC' or input_string == 'VEHICLE':
-        return '80eeb'
-    elif input_string == 'POLITICAL' or input_string == 'PARTY':
-        return '80ggb'
+    if input_string == "PENSION":
+        return "80cc"
+    elif input_string == "ELECTRIC" or input_string == "VEHICLE":
+        return "80eeb"
+    elif input_string == "POLITICAL" or input_string == "PARTY":
+        return "80ggb"
 
     # worst cases second:
-    elif input_string in ('INS', 'INSURANCE', 'LIFE', 'HEALTH', 'PROVI', 'FUND', 'PF', 'SCHL', 'SCHOOL', 'CLG', 'COLLEGE',
-                          'UNIVERSITY', 'EDUCATIONAL INSTITUTE', 'EDU INST', 'STAMP DUTY', 'REGISTRATION FEES', 'STAMP',
-                          'REGISTRAR OFFICE'):
-        return '80c'
+    elif input_string in (
+        "INS",
+        "INSURANCE",
+        "LIFE",
+        "HEALTH",
+        "PROVI",
+        "FUND",
+        "PF",
+        "SCHL",
+        "SCHOOL",
+        "CLG",
+        "COLLEGE",
+        "UNIVERSITY",
+        "EDUCATIONAL INSTITUTE",
+        "EDU INST",
+        "STAMP DUTY",
+        "REGISTRATION FEES",
+        "STAMP",
+        "REGISTRAR OFFICE",
+    ):
+        return "80c"
 
-    elif input_string in ('MONEY', 'MUTUAL', 'FUND', 'ASSET', 'FINAN', 'LIFE'):
-        return '80ccg'
+    elif input_string in ("MONEY", "MUTUAL", "FUND", "ASSET", "FINAN", "LIFE"):
+        return "80ccg"
 
-    elif input_string in ('MEDI', 'HOSP', 'HOSPITAL', 'CHECKUP', 'BODYCHECKUP', 'SCAN'):
-        return '80d/80dd'
+    elif input_string in ("MEDI", "HOSP", "HOSPITAL", "CHECKUP", "BODYCHECKUP", "SCAN"):
+        return "80d/80dd"
 
-    elif input_string in ('EDU', 'FINAN', 'INSTITU', 'CHARITAB', 'INT', 'HOUSE LOAN', 'INTEREST', 'INTREST'):
-        return '80ee'
+    elif input_string in (
+        "EDU",
+        "FINAN",
+        "INSTITU",
+        "CHARITAB",
+        "INT",
+        "HOUSE LOAN",
+        "INTEREST",
+        "INTREST",
+    ):
+        return "80ee"
 
-    elif input_string in ('DONATION', 'DONA', 'TRUST', 'HOME', 'RENT'):
-        return '80g'
+    elif input_string in ("DONATION", "DONA", "TRUST", "HOME", "RENT"):
+        return "80g"
 
 
 def format_float(input_string: str, count=False):
 
-    if input_string == '0':
-        return '-'
+    if input_string == "0":
+        return "-"
 
     if regex_functions.isAmount(input_string):
         if not count:
@@ -47,13 +73,12 @@ def format_float(input_string: str, count=False):
 
 def chart_key(date):
 
-    seperator = '-' if '-' in date else ' ' if ' ' in date else '/'
+    seperator = "-" if "-" in date else " " if " " in date else "/"
 
     # for 26-OCT-2023
     if regex_functions.only_alpha(date) and date.split(seperator)[1].isalpha():
-        month_key = date.split(seperator)[
-            1] + f" '{ date.split(seperator)[-1][-2:] }"
-        date_key = date.split(seperator)[0] + '\n' + date.split(seperator)[1]
+        month_key = date.split(seperator)[1] + f" '{ date.split(seperator)[-1][-2:] }"
+        date_key = date.split(seperator)[0] + "\n" + date.split(seperator)[1]
 
     # for 26-10-2023
     else:
@@ -61,85 +86,82 @@ def chart_key(date):
 
         if date[1].isnumeric():
             month_key = MONTHS[int(date[1]) - 1][:3] + f" '{ date[-1][-2:] }"
-            date_key = date[0] + '\n' + MONTHS[int(date[1]) - 1][:3]
+            date_key = date[0] + "\n" + MONTHS[int(date[1]) - 1][:3]
 
         else:
             month_key = date[1] + f" '{ date[-1][-2:] }"
-            date_key = date.split(seperator)[
-                0] + '\n' + MONTHS[int(date[1]) - 1][:3]
+            date_key = date.split(seperator)[0] + "\n" + MONTHS[int(date[1]) - 1][:3]
 
     return [month_key, date_key]
 
 
 def find_date(raw):
-    date_index = raw[list(raw.keys())[0]] if len(
-        raw[list(raw.keys())[0]]) > 6 else raw[list(raw.keys())[1]]
-    date = (date_index.split('\n')[0] if len(date_index.split('\n')[1]) > 4 else date_index.replace(
-        '\n', '')) if len(date_index.split('\n')) > 1 else date_index
+    date_index = (
+        raw[list(raw.keys())[0]]
+        if len(raw[list(raw.keys())[0]]) > 6
+        else raw[list(raw.keys())[1]]
+    )
+    date = (
+        (
+            date_index.split("\n")[0]
+            if len(date_index.split("\n")[1]) > 4
+            else date_index.replace("\n", "")
+        )
+        if len(date_index.split("\n")) > 1
+        else date_index
+    )
 
     return date
 
 
-def date_index(raw: list):
-    if 'date' in raw:
-        return raw.index('date')
+def fetch_amount(raw_entry, trans_type, num_index):
 
-    return next((index for index, item in enumerate(raw) if 'date' in item), None)
+    amount = ""
 
+    if raw_entry.get(trans_type) is not None and len(raw_entry.get(trans_type)) > 1:
+        amount = raw_entry.get(trans_type)
 
-def description_index(raw: list):
-    desc_keys = ['particulars', 'description', 'details', 'narration']
-    for k in desc_keys:
-        if k in raw:
-            return raw.index(k)
+    else:
+        amount = raw_entry.get("AMOUNT") or raw_entry[list(raw_entry.keys())[num_index]]
 
-
-def dr_index(raw: list):
-    dr_keys = ['debit', 'withdrawal', 'withdrawals', 'dr', 'debit(rs)']
-    for k in dr_keys:
-        if k in raw:
-            return raw.index(k)
-
-    return None
-
-
-def cr_index(raw: list):
-    dr_keys = ['credit', 'deposits', 'deposit', 'cr', 'credit(rs)']
-
-    for k in dr_keys:
-        if k in raw:
-            return raw.index(k)
-
-    return None
-
-
-def find_amount(raw: list):
-    if 'amount' in raw:
-        return raw.index('amount')
-
-    return None
+    return amount.replace(",", "")
 
 
 def find_transaction_type(raw: list):
-    if 'type' in raw:
-        return raw.index('type')
+    if "type" in raw:
+        return raw.index("type")
 
     return None
 
 
-def format_transaction_type(entry: dict, index, dr_index):
-    trasc_type = entry[index] if index != None else 'DR' if entry[dr_index] != '' else 'CR'
+def find_transaction_type(raw_entry, check_index) -> str:
 
-    if trasc_type.lower() == 'debit':
-        return 'DR'
-    if trasc_type.lower() == 'credit':
-        return 'CR'
+    if raw_entry.get("TYPE") is not None:
+        if len(raw_entry.get("TYPE")) == 2:
+            return raw_entry.get("TYPE")
+        else:
+            return "DR" if str(raw_entry.get("TYPE")).lower() == "debit" else "CR"
 
-    return trasc_type.upper()
+    if raw_entry.get("CR") is not None and len(raw_entry.get("CR")) > 1:
+        return "CR"
+
+    if raw_entry.get("DR") is not None and len(raw_entry.get("DR")) > 1:
+        return "DR"
+
+    if len(raw_entry) - 1 == check_index:
+        return "CR"
+
+    if (
+        raw_entry[list(raw_entry.keys())[check_index]] == "-"
+        or raw_entry[list(raw_entry.keys())[check_index]] == ""
+    ):
+        return "DR"
+
+    return ""
 
 
 def closing_balance_index(raw: list):
-    cb_keys = ['balance(Rs)', 'balance']
+    cb_keys = ["balance(Rs)", "balance"]
 
     for k in cb_keys:
         if k in raw:
@@ -152,23 +174,25 @@ def convert_closing_balance(input_string: str):
 
     balance = input_string
 
-    if '\n' in balance:
-        balance = balance.split('\n')
+    if "\n" in balance:
+        balance = balance.split("\n")
 
-        if len(balance) > 0 and 'DR' in balance[1] and '.' in balance[0]:
-            return f'-{balance[0]}'
+        if len(balance) > 0 and "DR" in balance[1] and "." in balance[0]:
+            return f"-{balance[0]}"
 
-    if '.' in balance:
+    if "." in balance:
         return regex_functions.extract_numbers(balance)
 
     return None
 
 
 def find_desc(raw):
-    desc = r"" + (raw.get('PARTICULARS') or
-                  raw.get('DESCRIPTION') or
-                  raw.get('DETAILS') or
-                  raw.get('NARRATION')).replace('\n', '')
+    desc = r"" + (
+        raw.get("PARTICULARS")
+        or raw.get("DESCRIPTION")
+        or raw.get("DETAILS")
+        or raw.get("NARRATION")
+    ).replace("\n", "")
 
     return desc
 
@@ -178,27 +202,28 @@ def find_attr(raw_desc, transc_type):
     match = regex_functions.primary_attribute_checker(raw_desc)
     attr_desc = []
 
-    if 'ATM' in raw_desc:
-        if transc_type == 'DR':
-            attr_desc.append('ATM WITHDRAWAL')
+    if "ATM" in raw_desc:
+        if transc_type == "DR":
+            attr_desc.append("ATM WITHDRAWAL")
 
         else:
-            attr_desc.append('ATM DEPOSIT')
+            attr_desc.append("ATM DEPOSIT")
 
     elif match == []:
         match = regex_functions.secondary_attribute_checker(raw_desc)
 
     if len(match) > 0:
-        if 'WITHDRAWAL TRANSFER' in match[0]:
-            attr_desc.append(match[0].replace('WITHDRAWAL TRANSFER', ''))
+        if "WITHDRAWAL TRANSFER" in match[0]:
+            attr_desc.append(match[0].replace("WITHDRAWAL TRANSFER", ""))
 
-        elif 'WITHDRAWALTRANSFER' in match[0]:
-            attr_desc.append(match[0].replace('WITHDRAWALTRANSFER', ''))
+        elif "WITHDRAWALTRANSFER" in match[0]:
+            attr_desc.append(match[0].replace("WITHDRAWALTRANSFER", ""))
 
         else:
             for string in match:
                 attr = regex_functions.ternary_attribute_checker(
-                    string, keyword_pattern)
+                    string, keyword_pattern
+                )
 
                 if attr != None:
                     attr_desc.append(attr)
@@ -212,7 +237,6 @@ def find_first_float(raw):
 
     values_list = list(raw.values())
 
-    first_float = next(
-        filter(lambda x: isinstance(x, float), values_list), None)
+    first_float = next(filter(lambda x: isinstance(x, float), values_list), None)
 
     return first_float
