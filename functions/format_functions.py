@@ -1,6 +1,5 @@
 from functions import regex_functions
-from data import keyword_list, keyword_pattern
-from data import MONTHS
+from constants.MONTHS import MONTHS
 
 
 def ded_section(input_string: str):
@@ -221,9 +220,7 @@ def find_attr(raw_desc, transc_type):
 
         else:
             for string in match:
-                attr = regex_functions.ternary_attribute_checker(
-                    string, keyword_pattern
-                )
+                attr = regex_functions.ternary_attribute_checker(string)
 
                 if attr != None:
                     attr_desc.append(attr)
@@ -233,10 +230,17 @@ def find_attr(raw_desc, transc_type):
     return attr_desc
 
 
-def find_first_float(raw):
+def find_first_float(obj):
+    index = 0
+    for key, value in obj.items():
+        try:
+            float_value = float(value.replace(",", ""))
 
-    values_list = list(raw.values())
+            if index != 0 and isinstance(float_value, float):
+                return index
 
-    first_float = next(filter(lambda x: isinstance(x, float), values_list), None)
+        except ValueError:
+            pass
 
-    return first_float
+        index += 1
+    return index

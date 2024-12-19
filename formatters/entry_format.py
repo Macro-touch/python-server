@@ -10,7 +10,7 @@ from functions.format_functions import (
 )
 
 
-def extract_entries(data) -> list[dict]:
+def format_entries(data) -> list[dict]:
     data_upper = []
     entries = []
 

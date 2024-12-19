@@ -1,5 +1,5 @@
 import re
-from data import keyword_pattern
+from data.regex_patterns import keyword_pattern
 
 
 def isAmount(input_str):

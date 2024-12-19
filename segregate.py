@@ -1,14 +1,18 @@
-from data import table_headings
+from constants.TABLE_HEADINGS import TABLE_HEADINGS
+from formatters.charge_format import format_charge
+from formatters.ded_format import deduct_format
+from formatters.govt_format import format_govt
 from functions import format_functions, transaction_functions
-from generate_pdf import generate_pdf
-from models.model import AttributeModel, DuplicateModel, UnusualModel
-from transaction_check import TransactionCheck
+from pdf_scripts.pdf_gen import generate_pdf
+from models.DuplicateModel import DuplicateModel
+from models.UnusualModel import UnusualModel
+from models.AttributeModel import AttributeModel
 
 
 def segregate(data: list[dict], threshold: int, lang: int):
 
     # #### Variables #### #
-    header = table_headings["eng"]
+    header = TABLE_HEADINGS["eng"]
     CHARGES_LIST = ["CHG", header["CHG"]]
     MOP_LIST = ["MOP", header["MOP"]]
     MOP_DICT = {}
@@ -42,14 +46,15 @@ def segregate(data: list[dict], threshold: int, lang: int):
 
     # #### Function Starts #### #
     for entry in data:
-        checker = TransactionCheck(entry)
 
-        if checker.charges_checker() != None:
-            CHARGES_LIST.append(checker.charges_checker())
+        # BANK CHARGES
+        is_charges = format_charge(entry)
+        if is_charges != None:
+            CHARGES_LIST.append(is_charges)
 
-        if checker.mode_of_payment_checker() != None:
-            mode = checker.mode_of_payment_checker()
-
+        # MOP
+        mode = transaction_functions.mop_checker(entry["description"])
+        if mode != None:
             if mode not in MOP_DICT:
                 MOP_DICT[mode] = {"mode": mode, "count": 0, "DR": 0, "CR": 0}
 
@@ -57,33 +62,18 @@ def segregate(data: list[dict], threshold: int, lang: int):
             MOP_DICT[mode]["count"] += 1
             MOP_DICT[mode][entry["type"]] += float(entry["amount"])
 
-        if checker.government_grants() != None:
-            govt_key = checker.government_grants()
+        # GOVT. CHARGES
+        is_govt = format_govt(entry)
+        if is_govt is not None:
+            govt_key = is_govt[0]
+            govt_entry = is_govt[1]
 
-            if govt_key == "INTEREST":
-                GOVT_LIST[govt_key].append(
-                    [
-                        entry["date"],
-                        entry["description"],
-                        entry["amount"] if entry["type"] == "DR" else "-",
-                        entry["amount"] if entry["type"] == "CR" else "-",
-                    ]
-                )
+            GOVT_LIST[govt_key].append(govt_entry)
 
-            else:
-                GOVT_LIST[govt_key].append(
-                    [entry["date"], entry["description"], entry["amount"]]
-                )
-
-        if checker.deduction_check():
-            GOVT_LIST["DEDUCTION"].append(
-                [
-                    entry["date"],
-                    entry["description"],
-                    entry["amount"],
-                    format_functions.ded_section(checker.deduction_check()),
-                ]
-            )
+        # DEDUCTION
+        deduction = deduct_format(entry)
+        if deduction is not None:
+            GOVT_LIST["DEDUCTION"].append(deduction)
 
         # high value transaction
         transaction_amount = float(entry["amount"])

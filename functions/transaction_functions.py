@@ -1,5 +1,6 @@
 import re
-from data import charge_keyword, govt_pattern, deduct_key_pattern
+from data.keywords import charge_keyword
+from data.regex_patterns import deduct_key_pattern
 
 
 def type_changer(type: str) -> str:
@@ -39,7 +40,6 @@ def mop_checker(desc):
 
 
 def govt_checker(desc) -> str | None:
-    match = govt_pattern.search(desc)
 
     conditions = {
         "TDS": ["TDS"],
