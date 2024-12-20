@@ -44,7 +44,7 @@ def process_pdf(file, password, output_name):
     final_data = extract_data(decrypted_file)
     os.remove(decrypted_file)
 
-    # segregate(format_entries(final_data), 0, 0)
+    # segregate(format_entries(final_data), 0)
     return format_entries(final_data)
 
 

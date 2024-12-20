@@ -58,7 +58,7 @@ def create_pdf():
     # ######### Proceeding to PDF Generation ######### #
     try:
         transactions = json.loads(data)
-        result_file_path = segregate(transactions, threshold, lang)
+        result_file_path = segregate(transactions, lang)
 
         # ######### Proceeding to PDF Generation ######### #
         print(result_file_path, flush=True)

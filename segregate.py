@@ -2,6 +2,7 @@ from constants.TABLE_HEADINGS import TABLE_HEADINGS
 from formatters.charge_format import format_charge
 from formatters.ded_format import deduct_format
 from formatters.govt_format import format_govt
+from formatters.oversight_format import OversightFormat
 from functions import format_functions, transaction_functions
 from pdf_scripts.pdf_gen import generate_pdf
 from models.DuplicateModel import DuplicateModel
@@ -9,21 +10,20 @@ from models.UnusualModel import UnusualModel
 from models.AttributeModel import AttributeModel
 
 
-def segregate(data: list[dict], threshold: int, lang: int):
+def segregate(data: list[dict], lang: int):
 
     # #### Variables #### #
     header = TABLE_HEADINGS["eng"]
     CHARGES_LIST = ["CHG", header["CHG"]]
     MOP_LIST = ["MOP", header["MOP"]]
     MOP_DICT = {}
-    AMOUNT_OVERSIGHT = {"DR": [0, 0], "CR": [0, 0]}
 
     GOVT_LIST = {
         "TDS": ["TDS", header["GOV"]],
         "GRANT": ["GRANT", header["GOV"]],
         "DEDUCTION": ["DEDUCTION", header["DED"]],
         "TAX REFUND": ["REFUND", header["GOV"]],
-        "Advance Tax": ["ADVTAX", header["GOV"]],
+        "ADVANCE TAX": ["ADVTAX", header["GOV"]],
         "EMI": ["EMI", header["GOV"]],
         "CLOSURE": ["CLOSURE", header["GOV"]],
         "INTEREST": ["INTEREST", header["INT"]],
@@ -43,6 +43,9 @@ def segregate(data: list[dict], threshold: int, lang: int):
 
     HIGH_VAL_TRANSACTION = ["HVT", header["HVT"]]
     # #### Variables #### #
+
+    closure_format = OversightFormat(data)
+    threshold = closure_format.get_threshold()
 
     # #### Function Starts #### #
     for entry in data:
@@ -162,9 +165,6 @@ def segregate(data: list[dict], threshold: int, lang: int):
                     "CR": transaction_amount if payee.trans_type == "CR" else 0,
                 }
 
-        AMOUNT_OVERSIGHT[entry["type"]][0] += transaction_amount
-        AMOUNT_OVERSIGHT[entry["type"]][1] += 1
-
     MOP_LIST.extend(list(mop.values()) for mop in MOP_DICT.values())
 
     DR_SORTED_ATTRIBUTES_DICT = dict(
@@ -180,17 +180,13 @@ def segregate(data: list[dict], threshold: int, lang: int):
     for cr in CR_SORTED_ATTRIBUTES_DICT.values():
         CR_SORTED_ATTRIBUTES_LIST.append(list(cr.values()))
 
-    CLOSURE = [
-        header["CLS"],
-        ["Amount", AMOUNT_OVERSIGHT["DR"][0], AMOUNT_OVERSIGHT["CR"][0]],
-        ["Transaction", AMOUNT_OVERSIGHT["DR"][1], AMOUNT_OVERSIGHT["CR"][1]],
-    ]
+    CLOSURE = closure_format.get_closure_table(header["CLS"])
 
-    # THRESHOLD = round((max(float(TOTAL_OUTCOME), float(TOTAL_INCOME)) * 15) / 100, 2)
-    TOTAL_OUTCOME = round(AMOUNT_OVERSIGHT["DR"][0], 2)
-    TOTAL_INCOME = round(AMOUNT_OVERSIGHT["CR"][0], 2)
-    GROSS_OUTCOME = round(TOTAL_OUTCOME * 85 / 100, 2)
-    GROSS_INCOME = round(TOTAL_INCOME * 85 / 100, 2)
+    totals = closure_format.get_totals()
+    TOTAL_OUTCOME = totals[0]
+    TOTAL_INCOME = totals[1]
+    GROSS_OUTCOME = round(TOTAL_OUTCOME * 0.85, 2)
+    GROSS_INCOME = round(TOTAL_INCOME * 0.85, 2)
 
     generate_pdf(
         data,
