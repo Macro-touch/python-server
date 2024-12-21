@@ -230,13 +230,31 @@ def find_attr(raw_desc, transc_type):
     return attr_desc
 
 
+def find_cheque_no_index(entry: dict) -> int:
+
+    possible_keys = [
+        "CHEQUE\nNO",
+        "CHEQUE NO",
+        "CHECK NO",
+        "CHK NO",
+        "REF\nNO./CHEQUE NO",
+    ]
+
+    for key in possible_keys:
+        if key in entry:
+            return list(entry.keys()).index(key)
+
+
 def find_first_float(obj):
+
+    cheque_index = find_cheque_no_index(obj)
+
     index = 0
     for key, value in obj.items():
         try:
-            float_value = float(value.replace(",", ""))
+            float_value = float(str(value).replace(",", ""))
 
-            if index != 0 and isinstance(float_value, float):
+            if index != 0 and index != cheque_index and isinstance(float_value, float):
                 return index
 
         except ValueError:
