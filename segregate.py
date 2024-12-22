@@ -3,7 +3,7 @@ from formatters.charge_format import format_charge
 from formatters.ded_format import deduct_format
 from formatters.govt_format import format_govt
 from formatters.oversight_format import OversightFormat
-from functions import format_functions, transaction_functions
+from functions import transaction_functions
 from pdf_scripts.pdf_gen import generate_pdf
 from models.DuplicateModel import DuplicateModel
 from models.UnusualModel import UnusualModel

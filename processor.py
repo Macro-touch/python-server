@@ -1,6 +1,5 @@
 import pdfplumber
 import json
-import sys
 import PyPDF2
 import os
 

@@ -5,7 +5,6 @@ from processor import process_pdf
 import os
 import traceback
 from werkzeug.utils import secure_filename
-from segregate import segregate
 import json
 
 pdf_routes = Blueprint("pdf_routes", __name__)
@@ -59,7 +58,7 @@ def create_pdf():
     # ######### Proceeding to PDF Generation ######### #
     try:
         report = json.loads(data)
-        table_data = report.table_set1
+        table_data = report.get("table_set1")
 
         # result_file_path = segregate(transactions, lang)
 
@@ -75,10 +74,10 @@ def create_pdf():
                 table_data[4],
                 table_data[5],
             ],
-            table_set2=report.table_set2,
-            pie_data=report.pie_data,
-            line_data=report.line_data,
-            closure=report.closure,
+            table_set2=report.get("table_set2"),
+            pie_data=report.get("pie_data"),
+            line_data=report.get("line_data"),
+            closure=report.get("closure"),
         )
 
         pdf_build_data = pdf_chunk.get_pdf_data()
