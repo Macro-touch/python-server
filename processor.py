@@ -49,8 +49,8 @@ def process_pdf(file, password, output_name):
     # return format_entries(final_data)
 
 
-process_pdf(
-    "statements/bob.pdf",
-    "",
-    "report",
-)
+# process_pdf(
+#     "statements/bob.pdf",
+#     "",
+#     "report",
+# )
