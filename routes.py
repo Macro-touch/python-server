@@ -51,7 +51,7 @@ def create_pdf():
 
     # ######### Extract and validate parameters ######### #
     try:
-        data = request.form.get("transactions", [])
+        data = request.form.get("report", [])
         lang = int(request.form.get("language", 0))
 
     except ValueError:
