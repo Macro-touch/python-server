@@ -60,6 +60,7 @@ def create_pdf():
     # ######### Proceeding to PDF Generation ######### #
     try:
         data = json.loads(data)
+        print(type(data))
         print(data)
         report = data.report
         table_data = report.table_set1
