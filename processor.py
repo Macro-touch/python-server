@@ -42,21 +42,15 @@ def extract_data(pdf_path):
 def process_pdf(file, password, output_name):
     decrypted_file = decrypt_pdf(file, password, output_name)
     final_data = extract_data(decrypted_file)
-    os.remove(decrypted_file)
+    # os.remove(decrypted_file)
 
     # segregate(format_entries(final_data), 0)
-    return format_entries(final_data)
+    return segregate(format_entries(final_data), 0)
+    # return format_entries(final_data)
 
 
-if __name__ == "__main__":
-    file = sys.argv[1]
-    password = "" if sys.argv[2] == "null" else str(sys.argv[2])
-    output_name = sys.argv[3]
-
-    process_pdf(file, password, output_name)
-
-# process_pdf(
-#     "statements/CUB.pdf",
-#     "",
-#     "report",
-# )
+process_pdf(
+    "statements/bob.pdf",
+    "",
+    "report",
+)

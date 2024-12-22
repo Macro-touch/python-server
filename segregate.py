@@ -50,6 +50,8 @@ def segregate(data: list[dict], lang: int):
     # #### Function Starts #### #
     for entry in data:
 
+        print(entry)
+
         # BANK CHARGES
         is_charges = format_charge(entry)
         if is_charges != None:
@@ -188,10 +190,19 @@ def segregate(data: list[dict], lang: int):
     GROSS_OUTCOME = round(TOTAL_OUTCOME * 0.85, 2)
     GROSS_INCOME = round(TOTAL_INCOME * 0.85, 2)
 
+    # CHARGES_LIST,
+    # MOP_LIST,
+    # HIGH_VAL_TRANSACTION,
+    # UNUSUAL_LIST,
+    # DUPLICATE_LIST,
+    # DR_SORTED_ATTRIBUTES_LIST,
+
+    # print({"a": DR_SORTED_ATTRIBUTES_LIST})
+
     generate_pdf(
         data,
         DR_SORTED_ATTRIBUTES_LIST,
-        DR_SORTED_ATTRIBUTES_LIST,
+        CR_SORTED_ATTRIBUTES_LIST,
         GROSS_INCOME,
         GROSS_OUTCOME,
         TOTAL_INCOME,

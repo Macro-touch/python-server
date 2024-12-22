@@ -28,7 +28,7 @@ def generate_pdf(
     chart = ChartFormatter(
         data=data,
         dr_sorted_list=DR_SORTED_ATTRIBUTES_LIST[2:],  # without headings
-        cr_sorted_list=CR_SORTED_ATTRIBUTES_LIST[2:],
+        cr_sorted_list=CR_SORTED_ATTRIBUTES_LIST,
         gross_income=GROSS_INCOME,
         gross_outcome=GROSS_OUTCOME,
         total_dr=TOTAL_OUTCOME,
@@ -40,7 +40,27 @@ def generate_pdf(
     cr_values = [month_data["CR"] for month_data in line_chart_data[0].values()]
     line_chart_values = [[dr_values, cr_values], line_chart_data[1]]  # points  # Labels
 
+    final = {
+        "transactions": data,
+        "report": {
+            "table_set1": [
+                CHARGES_LIST,
+                MOP_LIST,
+                HIGH_VAL_TRANSACTION,
+                UNUSUAL_LIST,
+                DUPLICATE_LIST,
+                DR_SORTED_ATTRIBUTES_LIST,
+            ],
+            "table_set2": GOVT_LIST.values(),
+            "pie_data": [chart.pie_debit(), chart.pie_credit()],
+            "line_data": line_chart_values,
+            "closure": CLOSURE,
+        },
+    }
+
     # print(final)
+
+    return final
 
     pdf_chunk = GeneratePDFChunk(
         table_set1=[
