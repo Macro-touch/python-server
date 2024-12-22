@@ -51,7 +51,7 @@ def generate_pdf(
                 DUPLICATE_LIST,
                 DR_SORTED_ATTRIBUTES_LIST,
             ],
-            "table_set2": GOVT_LIST.values(),
+            "table_set2": list(GOVT_LIST.values()),
             "pie_data": [chart.pie_debit(), chart.pie_credit()],
             "line_data": line_chart_values,
             "closure": CLOSURE,
