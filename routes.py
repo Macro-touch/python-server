@@ -65,6 +65,7 @@ def create_pdf():
         # ######### Proceeding to PDF Generation ######### #
         # print(result_file_path, flush=True)
 
+        print(report, flush=True)
         pdf_chunk = GeneratePDFChunk(
             table_set1=[
                 table_data[0],
