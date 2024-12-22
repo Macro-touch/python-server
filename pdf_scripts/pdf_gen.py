@@ -1,3 +1,4 @@
+import json
 from formatters.chart_format import ChartFormatter
 from pdf_scripts.pdf_build import build_pdf
 from pdf_scripts.pdf_chunk_gen import GeneratePDFChunk
@@ -42,20 +43,22 @@ def generate_pdf(
 
     final = {
         "transactions": data,
-        "report": {
-            "table_set1": [
-                CHARGES_LIST,
-                MOP_LIST,
-                HIGH_VAL_TRANSACTION,
-                UNUSUAL_LIST,
-                DUPLICATE_LIST,
-                DR_SORTED_ATTRIBUTES_LIST,
-            ],
-            "table_set2": list(GOVT_LIST.values()),
-            "pie_data": [chart.pie_debit(), chart.pie_credit()],
-            "line_data": line_chart_values,
-            "closure": CLOSURE,
-        },
+        "report": json.dumps(
+            {
+                "table_set1": [
+                    CHARGES_LIST,
+                    MOP_LIST,
+                    HIGH_VAL_TRANSACTION,
+                    UNUSUAL_LIST,
+                    DUPLICATE_LIST,
+                    DR_SORTED_ATTRIBUTES_LIST,
+                ],
+                "table_set2": list(GOVT_LIST.values()),
+                "pie_data": [chart.pie_debit(), chart.pie_credit()],
+                "line_data": line_chart_values,
+                "closure": CLOSURE,
+            }
+        ),
     }
 
     # print(final)
