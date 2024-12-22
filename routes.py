@@ -51,6 +51,7 @@ def create_pdf():
     # ######### Extract and validate parameters ######### #
     try:
         data = request.form.get("report", {})
+        print(data, flush=True)
 
     except ValueError:
         return jsonify({"error": "Threshold and lang must be valid integers"}), 400
