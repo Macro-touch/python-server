@@ -51,20 +51,14 @@ def create_pdf():
 
     # ######### Extract and validate parameters ######### #
     try:
-        data = request.form.get("report", [])
-        print(request.form)
-        print("==============\n\n")
-        lang = int(request.form.get("language", 0))
+        report = request.form.get("report", [])
 
     except ValueError:
         return jsonify({"error": "Threshold and lang must be valid integers"}), 400
 
     # ######### Proceeding to PDF Generation ######### #
     try:
-        data = json.loads(data)
-        print(type(data))
-        print(data)
-        report = data.report
+        print(report)
         table_data = report.table_set1
 
         # result_file_path = segregate(transactions, lang)
