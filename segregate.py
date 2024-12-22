@@ -199,7 +199,7 @@ def segregate(data: list[dict], lang: int):
 
     # print({"a": DR_SORTED_ATTRIBUTES_LIST})
 
-    generate_pdf(
+    return generate_pdf(
         data,
         DR_SORTED_ATTRIBUTES_LIST,
         CR_SORTED_ATTRIBUTES_LIST,

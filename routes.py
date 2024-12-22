@@ -35,6 +35,7 @@ def upload_pdf():
 
         # Process the PDF
         result_json = process_pdf(pdf_path, password, "result")
+        print(result_json)
         return jsonify(result_json), 200
 
     except Exception as e:
