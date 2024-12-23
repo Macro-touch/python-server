@@ -33,5 +33,6 @@ def build_pdf(data):
     with open(output_pdf, "wb") as output_file:
         pdf_merger.write(output_file)
 
+    print(output_pdf)
     pdf_merger.close()
     os.remove(pdf_path)

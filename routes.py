@@ -88,8 +88,10 @@ def create_pdf():
             pdf_build_data = pdf_chunk.get_pdf_data()
             result_file_path = build_pdf(pdf_build_data)
 
+            print(result_file_path)
             if result_file_path:
                 # if result_file_path and os.path.exists(result_file_path):
+                print("Everything Done!")
                 return send_file(
                     result_file_path,
                     as_attachment=True,
