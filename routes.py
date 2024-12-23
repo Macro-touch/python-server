@@ -100,6 +100,7 @@ def create_pdf():
                 return jsonify({"error": "File generation failed"}), 500
 
         except Exception as e:
+            print(str(e), flush=True)
             traceback.print_exc()
             return (
                 jsonify({"error": "Error processing PDF", "details": str(e)}),
@@ -107,6 +108,7 @@ def create_pdf():
             )
 
     except Exception as e:
+        print(str(e), flush=True)
         traceback.print_exc()
         return (
             jsonify({"error": "Error processing PDF", "details": str(e)}),
