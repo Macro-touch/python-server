@@ -49,50 +49,62 @@ def create_pdf():
 
     # ######### Extract and validate parameters ######### #
     try:
-        data = request.form.get("report", "{}")
-        report = json.loads(json.loads(data))
-        print(type(report), flush=True)
-        print(report, flush=True)
 
-    except ValueError:
-        return jsonify({"error": "Threshold and lang must be valid integers"}), 400
+        try:
+            data = request.form.get("report", "{}")
+            report = json.loads(json.loads(data))
+            print(type(report), flush=True)
+            print(report, flush=True)
 
-    # ######### Proceeding to PDF Generation ######### #
-    try:
-        table_data = report.get("table_set1")
-
-        # result_file_path = segregate(transactions, lang)
+        except (ValueError, json.JSONDecodeError) as e:
+            return (
+                jsonify({"error": "Invalid JSON in 'report'", "details": str(e)}),
+                400,
+            )
 
         # ######### Proceeding to PDF Generation ######### #
-        # print(result_file_path, flush=True)
-        pdf_chunk = GeneratePDFChunk(
-            table_set1=[
-                table_data[0],
-                table_data[1],
-                table_data[2],
-                table_data[3],
-                table_data[4],
-                table_data[5],
-            ],
-            table_set2=report.get("table_set2"),
-            pie_data=report.get("pie_data"),
-            line_data=report.get("line_data"),
-            closure=report.get("closure"),
-        )
+        try:
+            table_data = report.get("table_set1")
 
-        pdf_build_data = pdf_chunk.get_pdf_data()
-        result_file_path = build_pdf(pdf_build_data)
+            # result_file_path = segregate(transactions, lang)
 
-        if result_file_path:
-            # if result_file_path and os.path.exists(result_file_path):
-            return send_file(
-                result_file_path,
-                as_attachment=True,
-                mimetype="application/pdf",
-                download_name="report.pdf",
+            # ######### Proceeding to PDF Generation ######### #
+            # print(result_file_path, flush=True)
+            pdf_chunk = GeneratePDFChunk(
+                table_set1=[
+                    table_data[0],
+                    table_data[1],
+                    table_data[2],
+                    table_data[3],
+                    table_data[4],
+                    table_data[5],
+                ],
+                table_set2=report.get("table_set2"),
+                pie_data=report.get("pie_data"),
+                line_data=report.get("line_data"),
+                closure=report.get("closure"),
             )
-        else:
-            return jsonify({"error": "File generation failed"}), 500
+
+            pdf_build_data = pdf_chunk.get_pdf_data()
+            result_file_path = build_pdf(pdf_build_data)
+
+            if result_file_path:
+                # if result_file_path and os.path.exists(result_file_path):
+                return send_file(
+                    result_file_path,
+                    as_attachment=True,
+                    mimetype="application/pdf",
+                    download_name="report.pdf",
+                )
+            else:
+                return jsonify({"error": "File generation failed"}), 500
+
+        except Exception as e:
+            traceback.print_exc()
+            return (
+                jsonify({"error": "Error processing PDF", "details": str(e)}),
+                500,
+            )
 
     except Exception as e:
         traceback.print_exc()

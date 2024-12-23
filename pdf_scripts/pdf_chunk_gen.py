@@ -23,6 +23,8 @@ from reportlab.graphics.charts.piecharts import Pie
 from reportlab.graphics.charts.linecharts import HorizontalLineChart
 import time
 
+from reportlab.pdfbase import pdfmetrics
+
 
 def current_milli_time():
     return round(time.time() * 1000)
@@ -55,6 +57,19 @@ class GeneratePDFChunk:
         return self.PDF_ELEMENTS
 
     def create_first_half(self):
+
+        font_name = "Helvetica-Bold"
+        font_name_1 = "Helvetica"
+        if pdfmetrics.getRegisteredFontNames().count(font_name):
+            print(f"{font_name} is available.", flush=True)
+        else:
+            print(f"{font_name} is NOT available!", flush=True)
+
+        if pdfmetrics.getRegisteredFontNames().count(font_name_1):
+            print(f"{font_name_1} is available.", flush=True)
+        else:
+            print(f"{font_name_1} is NOT available!", flush=True)
+
         # tables will be like :
         # [  Table Type, Table Heading, Table Values ]
 
