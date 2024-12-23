@@ -52,6 +52,7 @@ def create_pdf():
 
         try:
             data = request.form.get("report", "{}")
+            file_id = request.form.get("output_name", "")
             report = json.loads(json.loads(data))
 
         except (ValueError, json.JSONDecodeError) as e:
@@ -84,7 +85,7 @@ def create_pdf():
             )
 
             pdf_build_data = pdf_chunk.get_pdf_data()
-            result_file_path = build_pdf(pdf_build_data)
+            result_file_path = build_pdf(pdf_build_data, file_id)
 
             if result_file_path:
                 # if result_file_path and os.path.exists(result_file_path):

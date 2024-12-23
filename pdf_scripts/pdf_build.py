@@ -8,7 +8,7 @@ def current_milli_time():
     return round(time.time() * 1000)
 
 
-def build_pdf(data):
+def build_pdf(data, file_id):
 
     # creating a table pdf alone first
     pdf_path = sys.path[0] + "/table.pdf"
@@ -18,7 +18,7 @@ def build_pdf(data):
     # making Reports Directory
     # pdf_files = [sys.path[0] + '/cover.pdf', pdf_path]
     pdf_files = [pdf_path]
-    report_dir = "Reports"
+    report_dir = "Reports " + file_id
     os.makedirs(report_dir, exist_ok=True)
 
     # creating a merging the report file with table pdf
