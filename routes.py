@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, send_file
+from flask import Blueprint, request, jsonify, send_file, after_this_request
 from pdf_scripts.pdf_build import build_pdf
 from pdf_scripts.pdf_chunk_gen import GeneratePDFChunk
 from processor import process_pdf
@@ -86,10 +86,24 @@ def create_pdf():
             pdf_build_data = pdf_chunk.get_pdf_data()
             result_file_path = build_pdf(pdf_build_data)
 
-            print(result_file_path, flush=True)
             if result_file_path:
                 # if result_file_path and os.path.exists(result_file_path):
-                print("Everything Done!", flush=True)
+                print("Successfully Generated!", flush=True)
+
+                @after_this_request
+                def remove_file(response):
+                    print("file removing processing...")
+
+                    try:
+                        os.remove(result_file_path)
+                        print(
+                            f"File {result_file_path} deleted successfully", flush=True
+                        )
+
+                    except Exception as e:
+                        print(f"Error deleting file: {e}", flush=True)
+                    return response
+
                 return send_file(
                     result_file_path,
                     as_attachment=True,
