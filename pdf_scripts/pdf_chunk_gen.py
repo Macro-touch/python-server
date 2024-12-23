@@ -24,6 +24,7 @@ from reportlab.graphics.charts.linecharts import HorizontalLineChart
 import time
 
 from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 
 
 def current_milli_time():
@@ -40,6 +41,13 @@ class GeneratePDFChunk:
         table_set2: list,
         closure: list,
     ):
+
+        # font registering
+        pdfmetrics.registerFont(
+            TTFont("Helvetica-Bold", "static/fonts/Helvetica-Bold.ttf")
+        )
+        pdfmetrics.registerFont(TTFont("Helvetica", "static/fonts/Helvetica.ttf"))
+
         self.PDF_ELEMENTS = []
         self.set1 = (*table_set1,)
         self.pie_data = (*pie_data,)
