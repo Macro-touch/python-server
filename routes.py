@@ -51,7 +51,7 @@ def create_pdf():
     # ######### Extract and validate parameters ######### #
     try:
         data = request.form.get("report", "{}")
-        report = json.loads(data)
+        report = json.loads(json.loads(data))
         print(type(report), flush=True)
         print(report, flush=True)
 
