@@ -87,7 +87,6 @@ def create_pdf():
             result_file_path = build_pdf(pdf_build_data)
 
             print(result_file_path, flush=True)
-            print("Everything Done!", flush=True)
             if result_file_path:
                 # if result_file_path and os.path.exists(result_file_path):
                 print("Everything Done!", flush=True)
