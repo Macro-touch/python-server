@@ -4,7 +4,7 @@ from pdf_styles import (
     table_cell_Style,
     table_header_style,
     table_style,
-    TABLE_HEADINGS,
+    TABLE_TITLE,
     COL_WIDTH,
     PRIMARY_HVT_HEADING,
     PRIMARY_GOV_HEADING,
@@ -61,7 +61,7 @@ class GeneratePDFChunk:
         for sec in list(self.set1):
             tables = []
             heading_code = sec[0]
-            heading = TABLE_HEADINGS[heading_code]
+            heading = TABLE_TITLE[heading_code]
 
             # Adding Primary Heading for HVT, UNUSUAL & DUPLICATE
             if heading_code == "HVT":
@@ -170,7 +170,7 @@ class GeneratePDFChunk:
         for sec in list(self.set2):
             tables = []
             heading_code = sec[0]
-            heading = TABLE_HEADINGS[heading_code]
+            heading = TABLE_TITLE[heading_code]
 
             # Adding Primary Heading for HVT, UNUSUAL & DUPLICATE
             if heading_code == "TDS":

@@ -84,7 +84,7 @@ side_heading2.textColor = colors.darkcyan
 
 COL_WIDTH = {
     # 'CHG': ["15%", "30%", "15%", "10%", "30%"],
-    "CHG": ["16%", "28%", "28%", "28%"],
+    "CHG": ["15%", "45%", "20%", "20%"],
     "MOP": ["16%", "28%", "28%", "28%"],
     "HVT": ["15%", "45%", "20%", "20%"],
     "UNT": ["15%", "45%", "20%", "20%"],
@@ -102,7 +102,7 @@ COL_WIDTH = {
 }
 
 PRIMARY_HVT_HEADING = Paragraph(
-    "HIGH VALUE TRANSACTIONS, UNUSUAL TRANSACTIONS, DUPLICATE TRANSACTIONS",
+    "HIGH VALUE TRANSACTIONS,\n UNUSUAL TRANSACTIONS,\n DUPLICATE TRANSACTIONS",
     header_style,
 )
 
@@ -129,7 +129,7 @@ PIE_CHART_TYPE_HEADING = {
 }
 
 
-TABLE_HEADINGS = {
+TABLE_TITLE = {
     "CHG": Paragraph("BANK CHARGES ANALYSIS", header_style),
     "MOP": Paragraph("UPI - MODE OF PAYMENT\n(STATUS COUNT)", header_style),
     "HVT": Paragraph("HIGH VALUE TRANSACTIONS", getSampleStyleSheet()["Heading1"]),

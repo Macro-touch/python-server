@@ -34,7 +34,6 @@ def upload_pdf():
 
         # Process the PDF
         result_json = process_pdf(pdf_path, password, "result")
-        print(result_json)
         return jsonify(result_json), 200
 
     except Exception as e:
@@ -66,10 +65,6 @@ def create_pdf():
 
         # ######### Proceeding to PDF Generation ######### #
         # print(result_file_path, flush=True)
-
-        print("===========================", flush=True)
-        print(report, flush=True)
-        print("===========================", flush=True)
         pdf_chunk = GeneratePDFChunk(
             table_set1=[
                 table_data[0],

@@ -1,6 +1,7 @@
 TABLE_HEADINGS = {
     "eng": {
-        "CHG": ["Date", "Description", "Amount", "Type", "Details"],
+        # "CHG": ["Date", "Description", "Amount", "Type", "Details"],
+        "CHG": ["Date", "Description", "Amount", "Type"],
         "MOP": ["Particular", "Count", "Amount INFLOW", "Amount OUTFLOW"],
         "HVT": ["Date", "Decription", "Amount INFLOW", "Amount OUTFLOW"],
         "UNT": ["Date", "Decription", "Amount", "Type"],
