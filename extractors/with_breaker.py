@@ -1,21 +1,38 @@
+import json
 import re
+
+from functions.regex_functions import multiple_dates
 
 contains_new_line = re.compile(r"^\d+(\.\d*)?\n(?:[a-zA-Z]{0,2}|\d+)$")
 
 
 def with_breaker(pdf):
     tables = []
+
     for page in pdf.pages:
+        empty_rows_count = 0
+
         rows = page.extract_table()
 
-        # checking if the pdf does not contain row or col
+        if rows is None:
+            return []
+
+        rows_count = len(rows)
         if rows:
             for row in rows:
+                # Taking count of empty rows
+                if row.count("") == len(row):
+                    empty_rows_count = empty_rows_count + 1
+
+                # Detecting whether the row contains more than one date
                 for cell in row:
                     if cell is not None and cell.count("\n") > 3:
-                        return []
+                        if multiple_dates(cell):
+                            return []
 
-        tables.extend(rows)
+        # Making sure if the rows are fine, no empty rows are taken into the account
+        if rows_count > 1 and empty_rows_count < rows_count - 1:
+            tables.extend(rows)
 
     if tables:
         headers = tables[0]
