@@ -10,7 +10,7 @@ from models.UnusualModel import UnusualModel
 from models.AttributeModel import AttributeModel
 
 
-def segregate(data: list[dict]):
+def segregate(data: list[dict], lang:int):
 
     # #### Variables #### #
     header = TABLE_HEADINGS["eng"]
@@ -212,4 +212,5 @@ def segregate(data: list[dict]):
         DUPLICATE_LIST,
         GOVT_LIST,
         CLOSURE,
+        lang
     )

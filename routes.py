@@ -53,6 +53,7 @@ def create_pdf():
         try:
             data = request.form.get("report", "{}")
             lang = request.form.get("language", 0)
+            company_name = request.form.get("companyName")
             file_id = request.form.get("output_name", "")
             report = json.loads(json.loads(data))
 
@@ -87,7 +88,7 @@ def create_pdf():
             )
 
             pdf_build_data = pdf_chunk.get_pdf_data()
-            result_file_path = build_pdf(pdf_build_data, file_id)
+            result_file_path = build_pdf(pdf_build_data, file_id, company_name)
 
             if result_file_path:
                 # if result_file_path and os.path.exists(result_file_path):

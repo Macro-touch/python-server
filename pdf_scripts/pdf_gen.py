@@ -19,6 +19,7 @@ def generate_pdf(
     DUPLICATE_LIST,
     GOVT_LIST,
     CLOSURE,
+    lang
 ):
 
     # print("\nDR_SORTED_ATTRIBUTES_LIST: \n")
@@ -78,7 +79,8 @@ def generate_pdf(
         pie_data=[chart.pie_debit(), chart.pie_credit()],
         line_data=line_chart_values,
         closure=CLOSURE,
+        lang=lang,
     )
 
     pdf_build_data = pdf_chunk.get_pdf_data()
-    build_pdf(pdf_build_data)
+    build_pdf(pdf_build_data, '')
