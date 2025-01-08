@@ -52,6 +52,7 @@ def create_pdf():
 
         try:
             data = request.form.get("report", "{}")
+            lang = request.form.get("language", 0)
             file_id = request.form.get("output_name", "")
             report = json.loads(json.loads(data))
 
@@ -82,6 +83,7 @@ def create_pdf():
                 pie_data=report.get("pie_data"),
                 line_data=report.get("line_data"),
                 closure=report.get("closure"),
+                lang=lang
             )
 
             pdf_build_data = pdf_chunk.get_pdf_data()

@@ -2,11 +2,19 @@ from reportlab.platypus import TableStyle, Paragraph
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
+fonts = {
+    0: "Helvetica",  # English
+    1: "Noto",  # Hindi
+    2: "Noto-Tamil",  # Tamil
+    3: "Noto-Telugu",  # Hindi
+    4: "Noto-Malayalam",  # Malayalam
+    5: "Noto-Kannada",  # Telugu
+}
+
 # Table Header Style
 table_header_style = ParagraphStyle(
     "HeaderStyle",
     parent=getSampleStyleSheet()["Heading1"],
-    fontName="Helvetica-Bold",
     fontSize=11,
     textColor=colors.white,
     alignment=1,  # 0=Left, 1=Center, 2=Right
@@ -16,7 +24,6 @@ table_header_style = ParagraphStyle(
 table_cell_Style = ParagraphStyle(
     "CellStyle",
     parent=getSampleStyleSheet()["Normal"],
-    fontName="Helvetica",
     fontSize=10,
     textColor=colors.black,
     alignment=1,  # 0=Left, 1=Center, 2=Right
@@ -59,28 +66,49 @@ closure_table_style = TableStyle(
     ]
 )
 
-# Heading Style
-styles = getSampleStyleSheet()
-header_style = styles["Heading1"]
-header_style.fontSize = 25
-header_style.spaceAfter = 15
-header_style.fontWeight = "Bold"
-header_style.textColor = colors.HexColor("#743BC2")
+# Heading1 Style
+def header1_style(lang:int): 
+    return ParagraphStyle(
+        "Header1Style",
+        parent = getSampleStyleSheet()["Heading1"],
+        fontName=fonts.get(lang),
+        fontSize=25,
+        spaceAfter=15,
+        textColor=colors.HexColor("#743BC2"),
+        alignment=0,  # 0=Left, 1=Center, 2=Right
+    )
+    
+# Heading2 Style
+def header2_style(lang:int): 
+    return ParagraphStyle(
+        "Header2Style",
+        fontName=fonts.get(lang),
+        parent = getSampleStyleSheet()["Heading1"],
+        textColor=colors.black,
+        alignment=0,  # 0=Left, 1=Center, 2=Right
+    )
 
-# Side Heading 1
-side_head_style1 = getSampleStyleSheet()
-side_heading1 = side_head_style1["Normal"]
-side_heading1.fontSize = 15
-side_heading1.spaceAfter = 10
-side_heading1.textColor = colors.black
+def side_head_style1(lang:int):
+    return ParagraphStyle(
+        "SideHeading1",
+        fontName=fonts.get(lang),
+        parent=getSampleStyleSheet()["Normal"],
+        fontSize=15,
+        spaceAfter=10,
+        textColor=colors.black,
+        alignment=0
+    )
 
-# Side Heading 2
-side_head_style2 = getSampleStyleSheet()
-side_heading2 = side_head_style2["Normal"]
-side_heading2.fontSize = 15
-side_heading2.spaceAfter = 10
-side_heading2.textColor = colors.darkcyan
-
+def side_head_style2(lang:int):
+    return ParagraphStyle(
+        "SideHeading1",
+        fontName=fonts.get(lang),
+        parent=getSampleStyleSheet()["Normal"],
+        fontSize=15,
+        spaceAfter=10,
+        textColor=colors.darkcyan,
+        alignment=0
+    )
 
 COL_WIDTH = {
     # 'CHG': ["15%", "30%", "15%", "10%", "30%"],
@@ -101,51 +129,249 @@ COL_WIDTH = {
     "CLS": ["33.3%", "33.3%", "33.3%"],
 }
 
-PRIMARY_HVT_HEADING = Paragraph(
-    "HIGH VALUE TRANSACTIONS,\n UNUSUAL TRANSACTIONS,\n DUPLICATE TRANSACTIONS",
-    header_style,
-)
-
-PRIMARY_GOV_HEADING = Paragraph(
-    "RECEIPT OF GOVERNMENT GRANT & LIST OF TDS", header_style
-)
-
-
-PIE_CHART_HEADING = Paragraph("CHART ANALYSIS", header_style)
-PIE_LINE_HEADING = [
-    Paragraph("Monthly Analysis", getSampleStyleSheet()["Heading1"]),
-    Paragraph("-- OUTFLOW", side_heading1),
-    Paragraph("-- INFLOW", side_heading2),
-]
-
-RANDOM_HEADING = Paragraph("RANDOM VERIFICATION", header_style)
-closure_heading = Paragraph("CLOSURE", getSampleStyleSheet()["Heading1"])
-rb_heading = Paragraph("RUNNING BALANCE CHECK", getSampleStyleSheet()["Heading1"])
-
-
-PIE_CHART_TYPE_HEADING = {
-    "DR": Paragraph("Overall Cash Outflow", getSampleStyleSheet()["Heading1"]),
-    "CR": Paragraph("Overall Cash Inflow", getSampleStyleSheet()["Heading1"]),
+HEADINGS = {
+    "HVT": {
+        "texts": [
+            "HIGH VALUE TRANSACTIONS,\nUNUSUAL TRANSACTIONS,\nDUPLICATE TRANSACTIONS",  # English
+            "उच्च मूल्य लेनदेन,\nअसामान्य लेनदेन,\nडुप्लिकेट लेनदेन",  # Hindi
+            "உயர் மதிப்பு பரிவர்த்தனைகள்,\nஅசாதாரண பரிவர்த்தனைகள்,\nநகல் பரிவர்த்தனைகள்",  # Tamil
+            "అధిక విలువ లావాదేవీలు,\nఅసాధారణ లావాదేవీలు,\nనకిలీ లావాదేవీలు",  # Telugu
+            "ഉയർന്ന മൂല്യത്തിലുള്ള ഇടപാടുകൾ,\nഅസാധാരണ ഇടപാടുകൾ,\nആവർത്തിച്ച ഇടപാടുകൾ",  # Malayalam
+            "ಉನ್ನತ ಮೌಲ್ಯದ ವ್ಯವಹಾರಗಳು,\nಅಸಾಮಾನ್ಯ ವ್ಯವಹಾರಗಳು,\nಪ್ರತಿಲಿಪಿ ವ್ಯವಹಾರಗಳು",  # Kannada
+        ],
+        "style": header1_style,
+    },
+    "PRIMARY_GOV": {
+        "texts": [
+            "RECEIPT OF GOVERNMENT GRANT & LIST OF TDS",  # English
+            "सरकारी अनुदान की रसीद और टीडीएस की सूची",  # Hindi
+            "அரசு நன்கொடை ரசீதும் மற்றும் TDS பட்டியலும்",  # Tamil
+            "ప్రభుత్వ గ్రాంట్ స్వీకారం & TDS జాబితా",  # Telugu
+            "സർക്കാർ ധനസഹായം ലഭിക്കൽ & TDS ലിസ്റ്റ്",  # Malayalam
+            "ಸರ್ಕಾರಿ ಅನುದಾನದ ಸ್ವೀಕೃತಿ ಮತ್ತು TDS ಪಟ್ಟಿ",  # Kannada
+        ],
+        "style": header1_style,
+    },
+    "PIE_CHART": {
+        "texts": [
+            "CHART ANALYSIS",  # English
+            "चार्ट विश्लेषण",  # Hindi
+            "வழிகாட்டி பகுப்பாய்வு",  # Tamil
+            "చార్ట్ విశ్లేషణ",  # Telugu
+            "ചാർട്ട് വിശകലനം",  # Malayalam
+            "ಚಾರ್ಟ್ ವಿಶ್ಲೇಷಣೆ",  # Kannada
+        ],
+        "style": header1_style,
+    },
+    "PIE_LINE_HEADING": [
+        {"texts": ["Monthly Analysis", "मासिक विश्लेषण", "மாதாந்திர பகுப்பாய்வு", "నెలవారీ విశ్లేషణ", "മാസാന്ത്യ വിശകലനം", "ಮಾಸಿಕ ವಿಶ್ಲೇಷಣೆ"], "style":header2_style},
+        {"texts": ["-- OUTFLOW", "-- आउटफ्लो", "-- வெளியேற்றம்", "-- అవుట్‌ఫ్లో", "-- ഔട്ട്‌ഫ്ലോ", "-- ಔಟ್‌ಫ್ಲೋ"], "style": side_head_style1},
+        {"texts": ["-- INFLOW", "-- इनफ्लो", "-- உள்ளேற்றம்", "-- ఇన్‌ఫ్లో", "-- ഇൻഫ്ലോ", "-- ಇನ್‌ಫ್ಲೋ"], "style": side_head_style2},
+    ],
+    "RANDOM": {
+        "texts": [
+            "RANDOM VERIFICATION",  # English
+            "यादृच्छिक सत्यापन",  # Hindi
+            "சீரற்ற சரிபார்ப்பு",  # Tamil
+            "యాదృచ్ఛిక ధృవీకరణ",  # Telugu
+            "യാദൃച്ഛിക സ്ഥിരീകരണം",  # Malayalam
+            "ಯಾದೃಚ್ಛಿಕ ಪರಿಶೀಲನೆ",  # Kannada
+        ],
+        "style": header1_style,
+    },
+    "CLOSURE": {
+        "texts": [
+            "CLOSURE",  # English
+            "समापन",  # Hindi
+            "மூடல்",  # Tamil
+            "మూసివేత",  # Telugu
+            "നടവിലാക്കൽ",  # Malayalam
+            "ಮುಚ್ಚುವಿಕೆ",  # Kannada
+        ],
+        "style": header2_style,
+    },
+    "RB": {
+        "texts": [
+            "RUNNING BALANCE CHECK",  # English
+            "चल रहा शेष जांच",  # Hindi
+            "இயங்கும் இருப்பு சரிபார்ப்பு",  # Tamil
+            "రన్నింగ్ బ్యాలెన్స్ చెక్",  # Telugu
+            "റണ്ണിംഗ് ബാലൻസ് പരിശോധിക്കുക",  # Malayalam
+            "ರನ್ನಿಂಗ್ ಬ್ಯಾಲೆನ್ಸ್ ಚೆಕ್",  # Kannada
+        ],
+        "style": header2_style,
+    },
+    "DR": {
+        "texts": [
+        "Overall Cash Outflow",  # English
+        "कुल नकदी बहिर्वाह",  # Hindi
+        "மொத்த ரொக்க வெளியேற்றம்",  # Tamil
+        "మొత్తం నగదు అవుట్‌ఫ్లో",  # Telugu
+        "മൊത്തത്തിലുള്ള ക്യാഷ് ഔട്ട്‌ഫ്ലോ",  # Malayalam
+        "ಒಟ್ಟು ನಗದು ಔಟ್‌ಫ್ಲೋ",  # Kannada
+    ],
+    "style": header2_style,
+    },
+    "CR": {
+        "texts": [
+            "Overall Cash Inflow",  # English
+            "कुल नकदी प्रवाह",  # Hindi
+            "மொத்த ரொக்க உள்ளேற்றம்",  # Tamil
+            "మొత్తం నగదు ఇన్‌ఫ్లో",  # Telugu
+            "മൊത്തത്തിലുള്ള ക്യാഷ് ഇൻഫ്ലോ",  # Malayalam
+            "ಒಟ್ಟು ನಗದು ಇನ್‌ಫ್ಲೋ",  # Kannada
+        ],
+        "style": header2_style,
+    },
 }
 
 
-TABLE_TITLE = {
-    "CHG": Paragraph("BANK CHARGES ANALYSIS", header_style),
-    "MOP": Paragraph("UPI - MODE OF PAYMENT\n(STATUS COUNT)", header_style),
-    "HVT": Paragraph("HIGH VALUE TRANSACTIONS", getSampleStyleSheet()["Heading1"]),
-    "UNT": Paragraph("UNUSUAL TRANSACTIONS", getSampleStyleSheet()["Heading1"]),
-    "DUP": Paragraph("DUPLICATE TRANSACTIONS", getSampleStyleSheet()["Heading1"]),
-    "ATTR": Paragraph("ATTRIBUTE CLASSIFICATION", header_style),
-    "TDS": Paragraph("LIST OF TDS DETUCTED", getSampleStyleSheet()["Heading1"]),
-    "GRANT": Paragraph(
-        "RECEPIT OF GOVERNMENT GRANT", getSampleStyleSheet()["Heading1"]
-    ),
-    "DEDUCTION": Paragraph("DEDUCTION", getSampleStyleSheet()["Heading1"]),
-    "REFUND": Paragraph("TAX REFUND", getSampleStyleSheet()["Heading1"]),
-    "ADVTAX": Paragraph("ADVANCE TAX", getSampleStyleSheet()["Heading1"]),
-    "EMI": Paragraph("EMI", getSampleStyleSheet()["Heading1"]),
-    "CLOSURE": Paragraph("CLOSURE", getSampleStyleSheet()["Heading1"]),
-    "INTEREST": Paragraph(
-        "INTEREST CREDITED AND DEBITED", getSampleStyleSheet()["Heading1"]
-    ),
+TABLE_TITLES = {
+    "CHG": [
+        "BANK CHARGES ANALYSIS",  # English
+        "बैंक शुल्क विश्लेषण",  # Hindi
+        "வங்கி கட்டணங்கள் பகுப்பாய்வு",  # Tamil
+        "బ్యాంక్ ఛార్జెస్ విశ్లేషణ",  # Telugu
+        "ബാങ്ക് ചാർജുകൾ വിശകലനം",  # Malayalam
+        "ಬ್ಯಾಂಕ್ ಶುಲ್ಕಗಳ ವಿಶ್ಲೇಷಣೆ",  # Kannada
+    ],
+    "MOP": [
+        "UPI - MODE OF PAYMENT\n(STATUS COUNT)",  # English
+        "यूपीआई - भुगतान का तरीका\n(स्थिति गणना)",  # Hindi
+        "யுபிஐ - கட்டண முறை\n(நிலை எண்ணிக்கை)",  # Tamil
+        "యూపీఐ - చెల్లింపు మోడ్\n(స్థితి సంఖ్య)",  # Telugu
+        "യുപിഐ - പേയ്മെന്റ് മോഡ്\n(സ്റ്റാറ്റസ് കൗണ്ട്)",  # Malayalam
+        "ಯುಪಿಐ - ಪಾವತಿ ವಿಧಾನ\n(ಸ್ಥಿತಿ ಎಣಿಕೆ)",  # Kannada
+    ],
+    "HVT": [
+        "HIGH VALUE TRANSACTIONS",  # English
+        "उच्च मूल्य लेनदेन",  # Hindi
+        "உயர் மதிப்பு பரிவர்த்தனைகள்",  # Tamil
+        "అధిక విలువ లావాదేవీలు",  # Telugu
+        "ഉയർന്ന മൂല്യത്തിലുള്ള ഇടപാടുകൾ",  # Malayalam
+        "ಉನ್ನತ ಮೌಲ್ಯದ ವ್ಯವಹಾರಗಳು",  # Kannada
+    ],
+    "UNT": [
+        "UNUSUAL TRANSACTIONS",  # English
+        "असामान्य लेनदेन",  # Hindi
+        "அசாதாரண பரிவர்த்தனைகள்",  # Tamil
+        "అసాధారణ లావాదేవీలు",  # Telugu
+        "അസാധാരണ ഇടപാടുകൾ",  # Malayalam
+        "ಅಸಾಮಾನ್ಯ ವ್ಯವಹಾರಗಳು",  # Kannada
+    ],
+    "DUP": [
+        "DUPLICATE TRANSACTIONS",  # English
+        "डुप्लिकेट लेनदेन",  # Hindi
+        "நகல் பரிவர்த்தனைகள்",  # Tamil
+        "నకిలీ లావాదేవీలు",  # Telugu
+        "ആവർത്തിച്ച ഇടപാടുകൾ",  # Malayalam
+        "ಪ್ರತಿಲಿಪಿ ವ್ಯವಹಾರಗಳು",  # Kannada
+    ],
+    "ATTR": [
+        "ATTRIBUTE CLASSIFICATION",  # English
+        "गुणवत्ता वर्गीकरण",  # Hindi
+        "பண்புக்கூறுகளின் வகைப்படுத்தல்",  # Tamil
+        "లక్షణాల వర్గీకరణ",  # Telugu
+        "ഗുണവിശേഷത്തിന്റെ വിഭാഗീകരണം",  # Malayalam
+        "ಗುಣಲಕ್ಷಣ ವರ್ಗೀಕರಣ",  # Kannada
+    ],
+    "TDS": [
+        "LIST OF TDS DEDUCTED",  # English
+        "कटौती किए गए टीडीएस की सूची",  # Hindi
+        "கழிக்கப்பட்ட TDS பட்டியல்",  # Tamil
+        "తగ్గించిన TDS జాబితా",  # Telugu
+        "കുറച്ചെടുത്ത TDS ലിസ്റ്റ്",  # Malayalam
+        "ಕಡಿತಗೊಂಡ TDS ಪಟ್ಟಿ",  # Kannada
+    ],
+    "GRANT": [
+        "RECEIPT OF GOVERNMENT GRANT",  # English
+        "सरकारी अनुदान की रसीद",  # Hindi
+        "அரசு நன்கொடை ரசீது",  # Tamil
+        "ప్రభుత్వ గ్రాంట్ స్వీకారం",  # Telugu
+        "സർക്കാർ ധനസഹായം കിട്ടൽ",  # Malayalam
+        "ಸರ್ಕಾರಿ ಅನುದಾನದ ಸ್ವೀಕೃತಿ",  # Kannada
+    ],
+    "DEDUCTION": [
+        "DEDUCTION",  # English
+        "कटौती",  # Hindi
+        "கழிப்பு",  # Tamil
+        "తగ్గింపు",  # Telugu
+        "കുറവ്",  # Malayalam
+        "ಕಡಿತ",  # Kannada
+    ],
+    "REFUND": [
+        "TAX REFUND",  # English
+        "कर वापसी",  # Hindi
+        "வரி மீட்பு",  # Tamil
+        "పన్ను రిఫండ్",  # Telugu
+        "നികുതി തിരിച്ചടവ്",  # Malayalam
+        "ತೆರಿಗೆ ಮರುಪಾವತಿ",  # Kannada
+    ],
+    "ADVTAX": [
+        "ADVANCE TAX",  # English
+        "अग्रिम कर",  # Hindi
+        "முன்கூட்டிய வரி",  # Tamil
+        "ముందస్తు పన్ను",  # Telugu
+        "മുൻകൂർ നികുതി",  # Malayalam
+        "ಮುಂಗಡ ತೆರಿಗೆ",  # Kannada
+    ],
+    "EMI": [
+        "EMI",  # English
+        "ईएमआई",  # Hindi
+        "EMI",  # Tamil
+        "EMI",  # Telugu
+        "EMI",  # Malayalam
+        "EMI",  # Kannada
+    ],
+    "CLOSURE": [
+        "CLOSURE",  # English
+        "समापन",  # Hindi
+        "மூடல்",  # Tamil
+        "మూసివేత",  # Telugu
+        "നടവിലാക്കൽ",  # Malayalam
+        "ಮುಚ್ಚುವಿಕೆ",  # Kannada
+    ],
+    "INTEREST": [
+        "INTEREST CREDITED AND DEBITED",  # English
+        "सूद जमा और डेबिट किया गया",  # Hindi
+        "பட்டுவாடா செய்யப்பட்ட மற்றும் கடன் பட்டுவாடா",  # Tamil
+        "క్రెడిట్ మరియు డెబిట్ చేసిన వడ్డీ",  # Telugu
+        "കയറ്റവും ക്രെഡിറ്റും",  # Malayalam
+        "ಹೂಡಿಕೆ ಕ್ರೆಡಿಟ್ ಮತ್ತು ಡೆಬಿಟ್",  # Kannada
+    ],
 }
+
+def get_table_title(key, lang_index):
+    # Fetch the title text and style
+    title_list = TABLE_TITLES.get(key)
+    if not title_list:
+        raise ValueError(f"No title found for key: {key}")
+    
+    if not (0 <= lang_index < len(title_list)):
+        lang_index = 0
+    
+    title_text = title_list[lang_index]
+    style =  header2_style(lang_index)
+
+    if key == "CHG" or key == "MOP" or key == "ATTR":
+        style = header1_style(lang_index)
+    
+    # Return the Paragraph
+    return Paragraph(title_text, style)
+
+def get_heading(key, lang_index):
+    if key in HEADINGS:
+        heading_data = HEADINGS[key]
+    
+        if not heading_data:
+            raise ValueError(f"No heading found for key: {key}")
+
+
+        if isinstance(heading_data, list):  # Handle grouped headings like PIE_LINE
+            return [
+                Paragraph(item["texts"][lang_index], item["style"](lang_index)) for item in heading_data
+            ]
+
+        return Paragraph(heading_data["texts"][lang_index], heading_data["style"](lang_index))
+
+    raise ValueError(f"No heading found for key: {key}")

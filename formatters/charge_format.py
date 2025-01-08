@@ -8,7 +8,6 @@ def format_charge(entry: dict) -> list | None:
             entry["description"],
             entry["amount"],
             entry["type"],
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
         ]
 
     return None

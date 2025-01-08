@@ -71,24 +71,30 @@ def format_float(input_string: str, count=False):
 
 
 def chart_key(date):
-
     seperator = "-" if "-" in date else " " if " " in date else "/"
 
-    # for 26-OCT-2023
-    if regex_functions.only_alpha(date) and date.split(seperator)[1].isalpha():
-        month_key = date.split(seperator)[1] + f" '{ date.split(seperator)[-1][-2:] }"
-        date_key = date.split(seperator)[0] + "\n" + date.split(seperator)[1]
+    # for 26-OCT-2023 or 2 Sep 2023
+    if regex_functions.only_alpha(date) or (date.split(seperator)[1].isalpha() and date.split(seperator)[0].isnumeric()):
+        # Extract parts of the date
+        parts = date.split(seperator)
+        day = parts[0]  # Numeric day
+        month = parts[1]  # Month as a word
+        year = parts[2]  # Year
+
+        # Construct the keys
+        month_key = month[:3] + f" '{year[-2:]}"  # Abbreviated month + last two digits of the year
+        date_key = day + "\n" + month[:3]  # Day + abbreviated month
 
     # for 26-10-2023
     else:
         date = date.split(seperator)
 
         if date[1].isnumeric():
-            month_key = MONTHS[int(date[1]) - 1][:3] + f" '{ date[-1][-2:] }"
+            month_key = MONTHS[int(date[1]) - 1][:3] + f" '{date[-1][-2:]}"
             date_key = date[0] + "\n" + MONTHS[int(date[1]) - 1][:3]
 
         else:
-            month_key = date[1] + f" '{ date[-1][-2:] }"
+            month_key = date[1] + f" '{date[-1][-2:]}"
             date_key = date.split(seperator)[0] + "\n" + MONTHS[int(date[1]) - 1][:3]
 
     return [month_key, date_key]
@@ -100,15 +106,24 @@ def find_date(raw):
         if len(raw[list(raw.keys())[0]]) > 6
         else raw[list(raw.keys())[1]]
     )
-    date = (
-        (
-            date_index.split("\n")[0]
-            if len(date_index.split("\n")[1]) > 4
-            else date_index.replace("\n", "")
-        )
-        if len(date_index.split("\n")) > 1
-        else date_index
-    )
+
+    splitted_date = date_index.split("\n")
+
+    date = ""
+    
+    if len(splitted_date) > 1:
+        
+        if len(splitted_date[1]) > 4:
+            date = splitted_date[0]
+        
+        elif len(splitted_date[1]) <= 4:
+            date = splitted_date[0] + " " + splitted_date[1]
+        
+        else:
+            date_index.replace("\n", "")
+    
+    else:
+        date = splitted_date[0]
 
     return date
 

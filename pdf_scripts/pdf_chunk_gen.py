@@ -4,17 +4,19 @@ from pdf_styles import (
     table_cell_Style,
     table_header_style,
     table_style,
-    TABLE_TITLE,
     COL_WIDTH,
-    PRIMARY_HVT_HEADING,
-    PRIMARY_GOV_HEADING,
-    PIE_CHART_HEADING,
-    PIE_CHART_TYPE_HEADING,
-    PIE_LINE_HEADING,
-    closure_heading,
-    RANDOM_HEADING,
+    get_table_title,
+    get_heading,
     UPI_table_style,
     closure_table_style,
+    # TABLE_TITLE,
+    # PRIMARY_HVT_HEADING,
+    # PRIMARY_GOV_HEADING,
+    # PIE_CHART_HEADING,
+    # PIE_CHART_TYPE_HEADING,
+    # PIE_LINE_HEADING,
+    # closure_heading,
+    # RANDOM_HEADING,
 )
 
 from functions import format_functions
@@ -40,13 +42,18 @@ class GeneratePDFChunk:
         line_data: list,
         table_set2: list,
         closure: list,
+        lang: int,
     ):
 
         # font registering
-        pdfmetrics.registerFont(
-            TTFont("Helvetica-Bold", "static/fonts/Helvetica-Bold.ttf")
-        )
         pdfmetrics.registerFont(TTFont("Helvetica", "static/fonts/Helvetica.ttf"))
+        pdfmetrics.registerFont(TTFont("Noto", "static/fonts/NotoSans.ttf"))
+        pdfmetrics.registerFont(TTFont("Noto-Tamil", "static/fonts/NotoSansTamil.ttf"))
+        pdfmetrics.registerFont(TTFont("Noto-Telugu", "static/fonts/NotoSansTelugu.ttf"))
+        pdfmetrics.registerFont(TTFont("Noto-Malayalam", "static/fonts/NotoSansMalayalam.ttf"))
+        pdfmetrics.registerFont(TTFont("Noto-Kannada", "static/fonts/NotoSansKannada.ttf"))
+
+        self.lang = lang
 
         self.PDF_ELEMENTS = []
         self.set1 = (*table_set1,)
@@ -65,18 +72,11 @@ class GeneratePDFChunk:
         return self.PDF_ELEMENTS
 
     def create_first_half(self):
-
-        font_name = "Helvetica-Bold"
-        font_name_1 = "Helvetica"
-        if pdfmetrics.getRegisteredFontNames().count(font_name):
-            print(f"{font_name} is available.", flush=True)
-        else:
-            print(f"{font_name} is NOT available!", flush=True)
-
-        if pdfmetrics.getRegisteredFontNames().count(font_name_1):
-            print(f"{font_name_1} is available.", flush=True)
-        else:
-            print(f"{font_name_1} is NOT available!", flush=True)
+        # font_name = "NotoSans"
+        # if pdfmetrics.getRegisteredFontNames().count(font_name):
+        #     print(f"{font_name} is available.", flush=True)
+        # else:
+        #     print(f"{font_name} is NOT available!", flush=True)
 
         # tables will be like :
         # [  Table Type, Table Heading, Table Values ]
@@ -84,11 +84,12 @@ class GeneratePDFChunk:
         for sec in list(self.set1):
             tables = []
             heading_code = sec[0]
-            heading = TABLE_TITLE[heading_code]
+            # heading = TABLE_TITLE[heading_code]
+            heading = get_table_title(heading_code, self.lang)
 
             # Adding Primary Heading for HVT, UNUSUAL & DUPLICATE
             if heading_code == "HVT":
-                self.PDF_ELEMENTS.append(PRIMARY_HVT_HEADING)
+                self.PDF_ELEMENTS.append(get_heading(heading_code, self.lang))
             self.PDF_ELEMENTS.append(heading)
 
             # Adding table heading
@@ -129,10 +130,12 @@ class GeneratePDFChunk:
     def create_pie_chart(self):
 
         self.PDF_ELEMENTS.append(PageBreak())
-        self.PDF_ELEMENTS.append(PIE_CHART_HEADING)
+        # self.PDF_ELEMENTS.append(PIE_CHART_HEADING)
+        self.PDF_ELEMENTS.append(get_heading("PIE_CHART", self.lang))
 
         for key, data in enumerate(self.pie_data):
-            self.PDF_ELEMENTS.append(PIE_CHART_TYPE_HEADING[data[0]])
+            # self.PDF_ELEMENTS.append(PIE_CHART_TYPE_HEADING[data[0]])
+            self.PDF_ELEMENTS.append(get_heading(data[0], self.lang))
 
             labels = data[1][0]
             data = data[1][1]
@@ -162,9 +165,11 @@ class GeneratePDFChunk:
     def create_line_chart(self):
 
         self.PDF_ELEMENTS.append(PageBreak())
-        self.PDF_ELEMENTS.append(PIE_LINE_HEADING[0])
-        self.PDF_ELEMENTS.append(PIE_LINE_HEADING[1])
-        self.PDF_ELEMENTS.append(PIE_LINE_HEADING[2])
+
+        line_headings = get_heading("PIE_LINE_HEADING", self.lang)
+        self.PDF_ELEMENTS.append(line_headings[0])
+        self.PDF_ELEMENTS.append(line_headings[1])
+        self.PDF_ELEMENTS.append(line_headings[2])
 
         drawing = Drawing(400, 200)
         lc = HorizontalLineChart()
@@ -193,11 +198,12 @@ class GeneratePDFChunk:
         for sec in list(self.set2):
             tables = []
             heading_code = sec[0]
-            heading = TABLE_TITLE[heading_code]
+            # heading = TABLE_TITLE[heading_code]
+            heading = get_table_title(heading_code, self.lang)
 
             # Adding Primary Heading for HVT, UNUSUAL & DUPLICATE
             if heading_code == "TDS":
-                self.PDF_ELEMENTS.append(PRIMARY_GOV_HEADING)
+                self.PDF_ELEMENTS.append(get_heading("PRIMARY_GOV", self.lang))
             self.PDF_ELEMENTS.append(heading)
 
             # Adding table heading
@@ -233,10 +239,12 @@ class GeneratePDFChunk:
     def create_random_verification(self):
 
         # closure
-        self.PDF_ELEMENTS.append(RANDOM_HEADING)
+        # self.PDF_ELEMENTS.append(RANDOM_HEADING)
+        self.PDF_ELEMENTS.append(get_heading('RANDOM', self.lang))
         self.PDF_ELEMENTS.append(Spacer(1, 10))
 
-        self.PDF_ELEMENTS.append(closure_heading)
+        # self.PDF_ELEMENTS.append(closure_heading)
+        self.PDF_ELEMENTS.append(get_heading('CLOSURE', self.lang))
 
         closure_table = []
 

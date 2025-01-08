@@ -10,7 +10,7 @@ from models.UnusualModel import UnusualModel
 from models.AttributeModel import AttributeModel
 
 
-def segregate(data: list[dict], lang: int):
+def segregate(data: list[dict]):
 
     # #### Variables #### #
     header = TABLE_HEADINGS["eng"]
@@ -49,8 +49,6 @@ def segregate(data: list[dict], lang: int):
 
     # #### Function Starts #### #
     for entry in data:
-
-        print(entry)
 
         # BANK CHARGES
         is_charges = format_charge(entry)
