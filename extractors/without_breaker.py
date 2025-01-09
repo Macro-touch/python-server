@@ -269,11 +269,5 @@ def without_breaker(pdf):
                     "description"
                 ] += f'{" " if (entry["description"][-1] != "-") and (row[desc_index][-1] != "-") and (not is_last_letter_same) else ""}{row[desc_index]}'
 
-            # aading the last entry
-            if index == len(tables) - 1 and entry:
-                entries.append(entry)
-
-    # for e in entries:
-    #     print(e)
 
     return entries

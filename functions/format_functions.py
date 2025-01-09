@@ -155,6 +155,18 @@ def find_transaction_type(raw_entry, check_index) -> str:
             return raw_entry.get("TYPE")
         else:
             return "DR" if str(raw_entry.get("TYPE")).lower() == "debit" else "CR"
+        
+    if raw_entry.get("WITHDRAWALS") is not None:
+        amt = raw_entry.get("WITHDRAWALS")
+
+        if amt and float(amt.replace(',', '')) > 0: 
+            return "DR"
+    
+    if raw_entry.get("DEPOSITS") is not None:
+        amt = raw_entry.get("DEPOSITS")
+
+        if amt and float(amt.replace(',', '')) > 0:
+            return "CR"
 
     if raw_entry.get("CR") is not None and len(raw_entry.get("CR")) > 1:
         return "CR"
@@ -253,6 +265,7 @@ def find_cheque_no_index(entry: dict) -> int:
         "CHECK NO",
         "CHK NO",
         "REF\nNO./CHEQUE NO",
+        "TRAN ID"
     ]
 
     for key in possible_keys:
