@@ -101,10 +101,14 @@ def chart_key(date):
 
 
 def find_date(raw):
+    keys = list(raw.keys())
+    first_val = str(raw[keys[0]])
+    sec_val = str(raw[keys[1]])
+
     date_index = (
-        raw[list(raw.keys())[0]]
-        if len(raw[list(raw.keys())[0]]) > 6
-        else raw[list(raw.keys())[1]]
+        first_val
+        if len(first_val) > 6
+        else sec_val
     )
 
     splitted_date = date_index.split("\n")
