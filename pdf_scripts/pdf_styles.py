@@ -3,7 +3,7 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 fonts = {
-    0: "Noto",  # English
+    0: "Helvetica",  # English
     1: "Hindi",  # Hindi
     2: "Tamil",  # Tamil
     3: "Noto-Telugu",  # Hindi
@@ -71,7 +71,7 @@ def header1_style(font:str):
     return ParagraphStyle(
         "Header1Style",
         parent = getSampleStyleSheet()["Heading1"],
-        fontName="Tamil",
+        fontName=font,
         fontSize=25,
         spaceAfter=15,
         textColor=colors.HexColor("#743BC2"),
@@ -82,7 +82,7 @@ def header1_style(font:str):
 def header2_style(font:str): 
     return ParagraphStyle(
         "Header2Style",
-        fontName="Tamil",
+        fontName=font,
         parent = getSampleStyleSheet()["Heading1"],
         textColor=colors.black,
         alignment=0,  # 0=Left, 1=Center, 2=Right
@@ -91,7 +91,7 @@ def header2_style(font:str):
 def side_head_style1(font:str):
     return ParagraphStyle(
         "SideHeading1",
-        fontName="Tamil",
+        fontName=font,
         parent=getSampleStyleSheet()["Normal"],
         fontSize=15,
         spaceAfter=10,
@@ -102,7 +102,7 @@ def side_head_style1(font:str):
 def side_head_style2(font:str):
     return ParagraphStyle(
         "SideHeading1",
-        fontName="Tamil",
+        fontName=font,
         parent=getSampleStyleSheet()["Normal"],
         fontSize=15,
         spaceAfter=10,
