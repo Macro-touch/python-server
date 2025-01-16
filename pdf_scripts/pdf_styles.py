@@ -3,7 +3,7 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 fonts = {
-    0: "Helvetica",  # English
+    0: "Noto",  # English
     1: "Noto",  # Hindi
     2: "Noto-Tamil",  # Tamil
     3: "Noto-Telugu",  # Hindi

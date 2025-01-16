@@ -48,9 +48,6 @@ class GeneratePDFChunk:
         lang: int,
     ):
         
-        print(Path("static/fonts/NotoSans.ttf").resolve())
-        print(Path("static/fonts/NotoSansTamil.ttf").resolve())
-
         # font registering
         pdfmetrics.registerFont(TTFont("Helvetica", str(Path("static/fonts/Helvetica.ttf").resolve())))
         pdfmetrics.registerFont(TTFont("Noto", str(Path("static/fonts/NotoSans.ttf").resolve())))
