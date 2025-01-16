@@ -343,6 +343,7 @@ TABLE_TITLES = {
 
 def get_table_title(key, lang_index):
     print(lang_index)
+    print(fonts.get(lang_index))
 
     # Fetch the title text and style
     title_list = TABLE_TITLES.get(key)
@@ -357,7 +358,6 @@ def get_table_title(key, lang_index):
     print(title_text)
 
     style =  header2_style(lang_index)
-    print(style)
 
     if key == "CHG" or key == "MOP" or key == "ATTR":
         style = header1_style(lang_index)
