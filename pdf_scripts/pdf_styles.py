@@ -71,7 +71,7 @@ def header1_style(font:str):
     return ParagraphStyle(
         "Header1Style",
         parent = getSampleStyleSheet()["Heading1"],
-        fontName=font,
+        fontName="Tamil",
         fontSize=25,
         spaceAfter=15,
         textColor=colors.HexColor("#743BC2"),
@@ -82,7 +82,7 @@ def header1_style(font:str):
 def header2_style(font:str): 
     return ParagraphStyle(
         "Header2Style",
-        fontName=font,
+        fontName="Tamil",
         parent = getSampleStyleSheet()["Heading1"],
         textColor=colors.black,
         alignment=0,  # 0=Left, 1=Center, 2=Right
@@ -193,33 +193,33 @@ HEADINGS = {
     "RB": {
         "texts": [
             "RUNNING BALANCE CHECK",  # English
-            "चल रहा शेष जांच",  # Hindi
-            "இயங்கும் இருப்பு சரிபார்ப்பு",  # Tamil
-            "రన్నింగ్ బ్యాలెన్స్ చెక్",  # Telugu
-            "റണ്ണിംഗ് ബാലൻസ് പരിശോധിക്കുക",  # Malayalam
-            "ರನ್ನಿಂಗ್ ಬ್ಯಾಲೆನ್ಸ್ ಚೆಕ್",  # Kannada
+            u"चल रहा शेष जांच",  # Hindi
+            u"இயங்கும் இருப்பு சரிபார்ப்பு",  # Tamil
+            u"రన్నింగ్ బ్యాలెన్స్ చెక్",  # Telugu
+            u"റണ്ണിംഗ് ബാലൻസ് പരിശോധിക്കുക",  # Malayalam
+            u"ರನ್ನಿಂಗ್ ಬ್ಯಾಲೆನ್ಸ್ ಚೆಕ್",  # Kannada
         ],
         "style": header2_style,
     },
     "DR": {
         "texts": [
         "Overall Cash Outflow",  # English
-        "कुल नकदी बहिर्वाह",  # Hindi
-        "மொத்த ரொக்க வெளியேற்றம்",  # Tamil
-        "మొత్తం నగదు అవుట్‌ఫ్లో",  # Telugu
-        "മൊത്തത്തിലുള്ള ക്യാഷ് ഔട്ട്‌ഫ്ലോ",  # Malayalam
-        "ಒಟ್ಟು ನಗದು ಔಟ್‌ಫ್ಲೋ",  # Kannada
+        u"कुल नकदी बहिर्वाह",  # Hindi
+        u"மொத்த ரொக்க வெளியேற்றம்",  # Tamil
+        u"మొత్తం నగదు అవుట్‌ఫ్లో",  # Telugu
+        u"മൊത്തത്തിലുള്ള ക്യാഷ് ഔട്ട്‌ഫ്ലോ",  # Malayalam
+        u"ಒಟ್ಟು ನಗದು ಔಟ್‌ಫ್ಲೋ",  # Kannada
     ],
     "style": header2_style,
     },
     "CR": {
         "texts": [
             "Overall Cash Inflow",  # English
-            "कुल नकदी प्रवाह",  # Hindi
-            "மொத்த ரொக்க உள்ளேற்றம்",  # Tamil
-            "మొత్తం నగదు ఇన్‌ఫ్లో",  # Telugu
-            "മൊത്തത്തിലുള്ള ക്യാഷ് ഇൻഫ്ലോ",  # Malayalam
-            "ಒಟ್ಟು ನಗದು ಇನ್‌ಫ್ಲೋ",  # Kannada
+            u"कुल नकदी प्रवाह",  # Hindi
+            u"மொத்த ரொக்க உள்ளேற்றம்",  # Tamil
+            u"మొత్తం నగదు ఇన్‌ఫ్లో",  # Telugu
+            u"മൊത്തത്തിലുള്ള ക്യാഷ് ഇൻഫ്ലോ",  # Malayalam
+            u"ಒಟ್ಟು ನಗದು ಇನ್‌ಫ್ಲೋ",  # Kannada
         ],
         "style": header2_style,
     },
@@ -229,43 +229,43 @@ HEADINGS = {
 TABLE_TITLES = {
     "CHG": [
         "BANK CHARGES ANALYSIS",  # English
-        "बैंक शुल्क विश्लेषण",  # Hindi
-        "வங்கி கட்டணங்கள் பகுப்பாய்வு",  # Tamil
-        "బ్యాంక్ ఛార్జెస్ విశ్లేషణ",  # Telugu
-        "ബാങ്ക് ചാർജുകൾ വിശകലനം",  # Malayalam
-        "ಬ್ಯಾಂಕ್ ಶುಲ್ಕಗಳ ವಿಶ್ಲೇಷಣೆ",  # Kannada
+        u"बैंक शुल्क विश्लेषण",  # Hindi
+        u"வங்கி கட்டணங்கள் பகுப்பாய்வு",  # Tamil
+        u"బ్యాంక్ ఛార్జెస్ విశ్లేషణ",  # Telugu
+        u"ബാങ്ക് ചാർജുകൾ വിശകലനം",  # Malayalam
+        u"ಬ್ಯಾಂಕ್ ಶುಲ್ಕಗಳ ವಿಶ್ಲೇಷಣೆ",  # Kannada
     ],
     "MOP": [
         "UPI - MODE OF PAYMENT\n(STATUS COUNT)",  # English
-        "यूपीआई - भुगतान का तरीका\n(स्थिति गणना)",  # Hindi
-        "யுபிஐ - கட்டண முறை\n(நிலை எண்ணிக்கை)",  # Tamil
-        "యూపీఐ - చెల్లింపు మోడ్\n(స్థితి సంఖ్య)",  # Telugu
-        "യുപിഐ - പേയ്മെന്റ് മോഡ്\n(സ്റ്റാറ്റസ് കൗണ്ട്)",  # Malayalam
-        "ಯುಪಿಐ - ಪಾವತಿ ವಿಧಾನ\n(ಸ್ಥಿತಿ ಎಣಿಕೆ)",  # Kannada
+        u"यूपीआई - भुगतान का तरीका\n(स्थिति गणना)",  # Hindi
+        u"யுபிஐ - கட்டண முறை\n(நிலை எண்ணிக்கை)",  # Tamil
+        u"యూపీఐ - చెల్లింపు మోడ్\n(స్థితి సంఖ్య)",  # Telugu
+        u"യുപിഐ - പേയ്മെന്റ് മോഡ്\n(സ്റ്റാറ്റസ് കൗണ്ട്)",  # Malayalam
+        u"ಯುಪಿಐ - ಪಾವತಿ ವಿಧಾನ\n(ಸ್ಥಿತಿ ಎಣಿಕೆ)",  # Kannada
     ],
     "HVT": [
         "HIGH VALUE TRANSACTIONS",  # English
-        "उच्च मूल्य लेनदेन",  # Hindi
-        "உயர் மதிப்பு பரிவர்த்தனைகள்",  # Tamil
-        "అధిక విలువ లావాదేవీలు",  # Telugu
-        "ഉയർന്ന മൂല്യത്തിലുള്ള ഇടപാടുകൾ",  # Malayalam
-        "ಉನ್ನತ ಮೌಲ್ಯದ ವ್ಯವಹಾರಗಳು",  # Kannada
+        u"उच्च मूल्य लेनदेन",  # Hindi
+        u"உயர் மதிப்பு பரிவர்த்தனைகள்",  # Tamil
+        u"అధిక విలువ లావాదేవీలు",  # Telugu
+        u"ഉയർന്ന മൂല്യത്തിലുള്ള ഇടപാടുകൾ",  # Malayalam
+        u"ಉನ್ನತ ಮೌಲ್ಯದ ವ್ಯವಹಾರಗಳು",  # Kannada
     ],
     "UNT": [
         "UNUSUAL TRANSACTIONS",  # English
-        "असामान्य लेनदेन",  # Hindi
-        "அசாதாரண பரிவர்த்தனைகள்",  # Tamil
-        "అసాధారణ లావాదేవీలు",  # Telugu
-        "അസാധാരണ ഇടപാടുകൾ",  # Malayalam
-        "ಅಸಾಮಾನ್ಯ ವ್ಯವಹಾರಗಳು",  # Kannada
+        u"असामान्य लेनदेन",  # Hindi
+        u"அசாதாரண பரிவர்த்தனைகள்",  # Tamil
+        u"అసాధారణ లావాదేవీలు",  # Telugu
+        u"അസാധാരണ ഇടപാടുകൾ",  # Malayalam
+        u"ಅಸಾಮಾನ್ಯ ವ್ಯವಹಾರಗಳು",  # Kannada
     ],
     "DUP": [
         "DUPLICATE TRANSACTIONS",  # English
-        "डुप्लिकेट लेनदेन",  # Hindi
-        "நகல் பரிவர்த்தனைகள்",  # Tamil
-        "నకిలీ లావాదేవీలు",  # Telugu
-        "ആവർത്തിച്ച ഇടപാടുകൾ",  # Malayalam
-        "ಪ್ರತಿಲಿಪಿ ವ್ಯವಹಾರಗಳು",  # Kannada
+        u"डुप्लिकेट लेनदेन",  # Hindi
+        u"நகல் பரிவர்த்தனைகள்",  # Tamil
+        u"నకిలీ లావాదేవీలు",  # Telugu
+        u"ആവർത്തിച്ച ഇടപാടുകൾ",  # Malayalam
+        u"ಪ್ರತಿಲಿಪಿ ವ್ಯವಹಾರಗಳು",  # Kannada
     ],
     "ATTR": [
         "ATTRIBUTE CLASSIFICATION",  # English
@@ -364,7 +364,7 @@ def get_table_title(key, lang_index):
         style = header1_style(font_name)
     
     # Return the Paragraph
-    return Paragraph(u"{}".format(title_text.encode("utf-8").decode("utf-8")), style)
+    return Paragraph(title_text, style)
 
 def get_heading(key, lang_index):
 
@@ -380,9 +380,9 @@ def get_heading(key, lang_index):
 
         if isinstance(heading_data, list):  # Handle grouped headings like PIE_LINE
             return [
-                Paragraph(u"{}".format(item["texts"][lang_index].encode("utf-8").decode("utf-8")), item["style"](font_name)) for item in heading_data
+                Paragraph(item["texts"][lang_index], item["style"](font_name)) for item in heading_data
             ]
 
-        return Paragraph(u"{}".format(heading_data["texts"][lang_index].encode("utf-8").decode("utf-8")), heading_data["style"](font_name))
+        return Paragraph(heading_data["texts"][lang_index], heading_data["style"](font_name))
 
     raise ValueError(f"No heading found for key: {key}")
