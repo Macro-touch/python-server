@@ -91,7 +91,7 @@ def header2_style(font:str):
 def side_head_style1(font:str):
     return ParagraphStyle(
         "SideHeading1",
-        fontName=font,
+        fontName="Tamil",
         parent=getSampleStyleSheet()["Normal"],
         fontSize=15,
         spaceAfter=10,
@@ -102,7 +102,7 @@ def side_head_style1(font:str):
 def side_head_style2(font:str):
     return ParagraphStyle(
         "SideHeading1",
-        fontName=font,
+        fontName="Tamil",
         parent=getSampleStyleSheet()["Normal"],
         fontSize=15,
         spaceAfter=10,
