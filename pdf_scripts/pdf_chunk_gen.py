@@ -72,11 +72,18 @@ class GeneratePDFChunk:
         return self.PDF_ELEMENTS
 
     def create_first_half(self):
-        # font_name = "NotoSans"
-        # if pdfmetrics.getRegisteredFontNames().count(font_name):
-        #     print(f"{font_name} is available.", flush=True)
-        # else:
-        #     print(f"{font_name} is NOT available!", flush=True)
+        if pdfmetrics.getRegisteredFontNames().count("Helvetica"):
+            print("Helvetica is available.", flush=True)
+        if pdfmetrics.getRegisteredFontNames().count("Noto"):
+            print("Noto is available.", flush=True)
+        if pdfmetrics.getRegisteredFontNames().count("Noto-Tamil"):
+            print("Noto-Tamil is available.", flush=True)
+        if pdfmetrics.getRegisteredFontNames().count("Noto-Telugu"):
+            print("Noto-Telugu is available.", flush=True)
+        if pdfmetrics.getRegisteredFontNames().count("Noto-Malayalam"):
+            print("Noto-Malayalam is available.", flush=True)
+        if pdfmetrics.getRegisteredFontNames().count("Noto-Kannada"):
+            print("Noto-Kannada is available.", flush=True)
 
         # tables will be like :
         # [  Table Type, Table Heading, Table Values ]
