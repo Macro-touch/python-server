@@ -49,9 +49,9 @@ class GeneratePDFChunk:
         pdfmetrics.registerFont(TTFont("Helvetica", "static/fonts/Helvetica.ttf"))
         pdfmetrics.registerFont(TTFont("Noto", "static/fonts/NotoSans.ttf"))
         pdfmetrics.registerFont(TTFont("Noto-Tamil", "static/fonts/NotoSansTamil.ttf"))
-        # pdfmetrics.registerFont(TTFont("Noto-Telugu", "static/fonts/NotoSansTelugu.ttf"))
+        pdfmetrics.registerFont(TTFont("Noto-Telugu", "static/fonts/NotoSansTelugu.ttf"))
         pdfmetrics.registerFont(TTFont("Noto-Malayalam", "static/fonts/NotoSansMalayalam.ttf"))
-        # pdfmetrics.registerFont(TTFont("Noto-Kannada", "static/fonts/NotoSansKannada.ttf"))
+        pdfmetrics.registerFont(TTFont("Noto-Kannada", "static/fonts/NotoSansKannada.ttf"))
 
         self.lang = int(lang)
 

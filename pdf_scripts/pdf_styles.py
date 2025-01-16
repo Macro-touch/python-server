@@ -3,7 +3,7 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 fonts = {
-    0: "Helvetica",  # English
+    0: "Noto",  # English
     1: "Noto",  # Hindi
     2: "Noto-Tamil",  # Tamil
     3: "Noto-Telugu",  # Hindi
@@ -343,8 +343,7 @@ TABLE_TITLES = {
 
 def get_table_title(key, lang_index):
     print(lang_index)
-    print(fonts.get(lang_index))
-
+    
     # Fetch the title text and style
     title_list = TABLE_TITLES.get(key)
 
