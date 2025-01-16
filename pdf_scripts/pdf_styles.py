@@ -364,7 +364,7 @@ def get_table_title(key, lang_index):
         style = header1_style(font_name)
     
     # Return the Paragraph
-    return Paragraph(title_text.encode("utf-8").decode("utf-8"), style)
+    return Paragraph(u"{}".format(title_text.encode("utf-8").decode("utf-8")), style)
 
 def get_heading(key, lang_index):
 
@@ -380,9 +380,9 @@ def get_heading(key, lang_index):
 
         if isinstance(heading_data, list):  # Handle grouped headings like PIE_LINE
             return [
-                Paragraph(item["texts"][lang_index].encode("utf-8").decode("utf-8"), item["style"](font_name)) for item in heading_data
+                Paragraph(u"{}".format(item["texts"][lang_index].encode("utf-8").decode("utf-8")), item["style"](font_name)) for item in heading_data
             ]
 
-        return Paragraph(heading_data["texts"][lang_index].encode("utf-8").decode("utf-8"), heading_data["style"](font_name))
+        return Paragraph(u"{}".format(heading_data["texts"][lang_index].encode("utf-8").decode("utf-8")), heading_data["style"](font_name))
 
     raise ValueError(f"No heading found for key: {key}")
