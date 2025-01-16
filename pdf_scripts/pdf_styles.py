@@ -3,7 +3,7 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 fonts = {
-    0: "Noto",  # English
+    0: "Helvetica",  # English
     1: "Noto",  # Hindi
     2: "Noto-Tamil",  # Tamil
     3: "Noto-Telugu",  # Hindi
@@ -67,11 +67,11 @@ closure_table_style = TableStyle(
 )
 
 # Heading1 Style
-def header1_style(lang:int): 
+def header1_style(font:str): 
     return ParagraphStyle(
         "Header1Style",
         parent = getSampleStyleSheet()["Heading1"],
-        fontName=fonts.get(lang),
+        fontName=font,
         fontSize=25,
         spaceAfter=15,
         textColor=colors.HexColor("#743BC2"),
@@ -79,19 +79,19 @@ def header1_style(lang:int):
     )
     
 # Heading2 Style
-def header2_style(lang:int): 
+def header2_style(font:str): 
     return ParagraphStyle(
         "Header2Style",
-        fontName=fonts.get(lang),
+        fontName=font,
         parent = getSampleStyleSheet()["Heading1"],
         textColor=colors.black,
         alignment=0,  # 0=Left, 1=Center, 2=Right
     )
 
-def side_head_style1(lang:int):
+def side_head_style1(font:str):
     return ParagraphStyle(
         "SideHeading1",
-        fontName=fonts.get(lang),
+        fontName=font,
         parent=getSampleStyleSheet()["Normal"],
         fontSize=15,
         spaceAfter=10,
@@ -99,10 +99,10 @@ def side_head_style1(lang:int):
         alignment=0
     )
 
-def side_head_style2(lang:int):
+def side_head_style2(font:str):
     return ParagraphStyle(
         "SideHeading1",
-        fontName=fonts.get(lang),
+        fontName=font,
         parent=getSampleStyleSheet()["Normal"],
         fontSize=15,
         spaceAfter=10,
@@ -342,7 +342,6 @@ TABLE_TITLES = {
 }
 
 def get_table_title(key, lang_index):
-    print(lang_index)
     
     # Fetch the title text and style
     title_list = TABLE_TITLES.get(key)
@@ -356,15 +355,22 @@ def get_table_title(key, lang_index):
     title_text = title_list[lang_index]
     print(title_text)
 
-    style =  header2_style(lang_index)
+    font_name = fonts.get(lang_index)
+    print(font_name)
+
+    style =  header2_style(font_name)
 
     if key == "CHG" or key == "MOP" or key == "ATTR":
-        style = header1_style(lang_index)
+        style = header1_style(font_name)
     
     # Return the Paragraph
     return Paragraph(title_text, style)
 
 def get_heading(key, lang_index):
+
+    font_name = fonts.get(lang_index)
+    print(font_name)
+
     if key in HEADINGS:
         heading_data = HEADINGS[key]
     
@@ -374,9 +380,9 @@ def get_heading(key, lang_index):
 
         if isinstance(heading_data, list):  # Handle grouped headings like PIE_LINE
             return [
-                Paragraph(item["texts"][lang_index], item["style"](lang_index)) for item in heading_data
+                Paragraph(item["texts"][lang_index], item["style"](font_name)) for item in heading_data
             ]
 
-        return Paragraph(heading_data["texts"][lang_index], heading_data["style"](lang_index))
+        return Paragraph(heading_data["texts"][lang_index], heading_data["style"](font_name))
 
     raise ValueError(f"No heading found for key: {key}")
