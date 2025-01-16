@@ -25,9 +25,12 @@ from reportlab.graphics.charts.piecharts import Pie
 from reportlab.graphics.charts.linecharts import HorizontalLineChart
 import time
 
+from pathlib import Path
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+import reportlab.rl_config
 
+reportlab.rl_config.verbose = True
 
 def current_milli_time():
     return round(time.time() * 1000)
@@ -44,14 +47,17 @@ class GeneratePDFChunk:
         closure: list,
         lang: int,
     ):
+        
+        print(Path("static/fonts/NotoSans.ttf").resolve())
+        print(Path("static/fonts/NotoSansTamil.ttf").resolve())
 
         # font registering
-        pdfmetrics.registerFont(TTFont("Helvetica", "static/fonts/Helvetica.ttf"))
-        pdfmetrics.registerFont(TTFont("Noto", "static/fonts/NotoSans.ttf"))
-        pdfmetrics.registerFont(TTFont("Noto-Tamil", "static/fonts/NotoSansTamil.ttf"))
-        pdfmetrics.registerFont(TTFont("Noto-Telugu", "static/fonts/NotoSansTelugu.ttf"))
-        pdfmetrics.registerFont(TTFont("Noto-Malayalam", "static/fonts/NotoSansMalayalam.ttf"))
-        pdfmetrics.registerFont(TTFont("Noto-Kannada", "static/fonts/NotoSansKannada.ttf"))
+        pdfmetrics.registerFont(TTFont("Helvetica", str(Path("static/fonts/Helvetica.ttf").resolve())))
+        pdfmetrics.registerFont(TTFont("Noto", str(Path("static/fonts/NotoSans.ttf").resolve())))
+        pdfmetrics.registerFont(TTFont("Noto-Tamil", str(Path("static/fonts/NotoSansTamil.ttf").resolve())))
+        pdfmetrics.registerFont(TTFont("Noto-Telugu", str(Path("static/fonts/NotoSansTelugu.ttf").resolve())))
+        pdfmetrics.registerFont(TTFont("Noto-Malayalam", str(Path("static/fonts/NotoSansMalayalam.ttf").resolve())))
+        pdfmetrics.registerFont(TTFont("Noto-Kannada", str(Path("static/fonts/NotoSansKannada.ttf").resolve())))
 
         self.lang = int(lang)
 
@@ -72,18 +78,8 @@ class GeneratePDFChunk:
         return self.PDF_ELEMENTS
 
     def create_first_half(self):
-        if pdfmetrics.getRegisteredFontNames().count("Helvetica"):
-            print("Helvetica is available.", flush=True)
-        if pdfmetrics.getRegisteredFontNames().count("Noto"):
-            print("Noto is available.", flush=True)
-        if pdfmetrics.getRegisteredFontNames().count("Noto-Tamil"):
-            print("Noto-Tamil is available.", flush=True)
-        if pdfmetrics.getRegisteredFontNames().count("Noto-Telugu"):
-            print("Noto-Telugu is available.", flush=True)
-        if pdfmetrics.getRegisteredFontNames().count("Noto-Malayalam"):
-            print("Noto-Malayalam is available.", flush=True)
-        if pdfmetrics.getRegisteredFontNames().count("Noto-Kannada"):
-            print("Noto-Kannada is available.", flush=True)
+        print("Available Fonts:", pdfmetrics.getRegisteredFontNames())
+
 
         # tables will be like :
         # [  Table Type, Table Heading, Table Values ]
