@@ -4,10 +4,10 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
 fonts = {
     0: "Noto",  # English
-    1: "Noto",  # Hindi
-    2: "Noto-Tamil",  # Tamil
+    1: "Hindi",  # Hindi
+    2: "Tamil",  # Tamil
     3: "Noto-Telugu",  # Hindi
-    4: "Noto-Malayalam",  # Malayalam
+    4: "Malayalam",  # Malayalam
     5: "Noto-Kannada",  # Telugu
 }
 
