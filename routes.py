@@ -52,7 +52,7 @@ def create_pdf():
 
         try:
             data = request.form.get("report", "{}")
-            lang = request.form.get("language", 0)
+            lang = int(request.form.get("language", 0))
             company_name = request.form.get("companyName")
             file_id = request.form.get("output_name", "")
             report = json.loads(json.loads(data))

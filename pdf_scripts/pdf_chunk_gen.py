@@ -53,7 +53,7 @@ class GeneratePDFChunk:
         pdfmetrics.registerFont(TTFont("Noto-Malayalam", "static/fonts/NotoSansMalayalam.ttf"))
         pdfmetrics.registerFont(TTFont("Noto-Kannada", "static/fonts/NotoSansKannada.ttf"))
 
-        self.lang = lang
+        self.lang = int(lang)
 
         self.PDF_ELEMENTS = []
         self.set1 = (*table_set1,)
