@@ -16,7 +16,7 @@ def add_footer(input_pdf_path, output_pdf_path, footer_text, page_text, optional
 
     # Add footer on each page
     for page_num in range(num_pages):
-        footer_canvas.setFont("Helvetica", 9)
+        footer_canvas.setFont("Noto", 9)
         # Bottom left: "Macrotouch"
         footer_canvas.drawString(30, 15, footer_text)
 
