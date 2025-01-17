@@ -12,4 +12,5 @@ locale -a
 
 # Proceed with other build steps
 pip install -r requirements.txt
+docker build -t macrotouch .
 python app.py
