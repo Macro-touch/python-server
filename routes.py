@@ -91,7 +91,6 @@ def create_pdf():
             result_file_path = build_pdf(pdf_build_data, file_id, company_name)
 
             if result_file_path:
-                # if result_file_path and os.path.exists(result_file_path):
                 print("Successfully Generated!", flush=True)
 
                 @after_this_request
@@ -107,9 +106,12 @@ def create_pdf():
                     except Exception as e:
                         print(f"Error deleting file: {e}", flush=True)
                     return response
+                
+                with open(result_file_path, "rb") as file:
+                    pdf_bytes = file.read()
 
                 return send_file(
-                    result_file_path,
+                    pdf_bytes,
                     as_attachment=True,
                     mimetype="application/pdf",
                     download_name="report.pdf",
