@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, send_file, after_this_request
+from flask import Blueprint, request, jsonify, Response, after_this_request
 from pdf_scripts.pdf_build import build_pdf
 from pdf_scripts.pdf_chunk_gen import GeneratePDFChunk
 from processor import process_pdf
@@ -6,6 +6,7 @@ import os
 import traceback
 from werkzeug.utils import secure_filename
 import json
+from io import BytesIO
 
 pdf_routes = Blueprint("pdf_routes", __name__)
 
@@ -93,6 +94,11 @@ def create_pdf():
             if result_file_path:
                 print("Successfully Generated!", flush=True)
 
+                with open(result_file_path, "rb") as file:
+                    pdf_bytes = file.read()
+                
+                pdf_stream = BytesIO(pdf_bytes)
+
                 @after_this_request
                 def remove_file(response):
                     print("file removing processing...")
@@ -107,15 +113,9 @@ def create_pdf():
                         print(f"Error deleting file: {e}", flush=True)
                     return response
                 
-                with open(result_file_path, "rb") as file:
-                    pdf_bytes = file.read()
-
-                return send_file(
-                    pdf_bytes,
-                    as_attachment=True,
-                    mimetype="application/pdf",
-                    download_name="report.pdf",
-                )
+                return Response(pdf_stream, 
+                    mimetype='application/pdf', 
+                    headers={"Content-Disposition": "attachment;filename=report.pdf"})
             else:
                 return jsonify({"error": "File generation failed"}), 500
 
