@@ -4,7 +4,7 @@ services:
     env: docker
     dockerfilePath: ./dockerfile
     buildCommand: ""
-    startCommand: python app.py
+    startCommand: ""
     envVars:
       - key: LANG
         value: en_US.UTF-8
