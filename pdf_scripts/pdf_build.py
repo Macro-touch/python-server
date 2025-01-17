@@ -5,7 +5,7 @@ import os
 import sys
 import PyPDF2
 
-def add_footer(input_pdf_path, output_pdf_path, footer_text, page_text, optional_text):
+def add_footer(input_pdf_path, output_pdf_path, footer_text, optional_text):
     # Create a new PDF for the footer
     footer_pdf_path = input_pdf_path.replace(".pdf", "_footer.pdf")
     footer_canvas = canvas.Canvas(footer_pdf_path, pagesize=letter)
@@ -16,7 +16,7 @@ def add_footer(input_pdf_path, output_pdf_path, footer_text, page_text, optional
 
     # Add footer on each page
     for page_num in range(num_pages):
-        footer_canvas.setFont("Noto", 9)
+        footer_canvas.setFont("Hindi", 9)
         # Bottom left: "Macrotouch"
         footer_canvas.drawString(30, 15, footer_text)
 
@@ -76,7 +76,6 @@ def build_pdf(data, file_id, company_name):
         input_pdf_path=output_pdf,
         output_pdf_path=output_pdf,
         footer_text="Macrotouch",
-        page_text="Page",
         optional_text=company_name
     )
 

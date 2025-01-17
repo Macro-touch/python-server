@@ -32,6 +32,13 @@ import reportlab.rl_config
 
 reportlab.rl_config.verbose = True
 
+pdfmetrics.registerFont(TTFont("Noto", str(Path("static/fonts/NotoSans.ttf").resolve())))
+pdfmetrics.registerFont(TTFont("Hindi", str(Path("static/fonts/hindi.ttf").resolve())))
+pdfmetrics.registerFont(TTFont("Tamil", str(Path("static/fonts/tamil.ttf").resolve())))
+pdfmetrics.registerFont(TTFont("Noto-Telugu", str(Path("static/fonts/NotoSansTelugu.ttf").resolve())))
+pdfmetrics.registerFont(TTFont("Malayalam", str(Path("static/fonts/malayalam.ttf").resolve())))
+pdfmetrics.registerFont(TTFont("Noto-Kannada", str(Path("static/fonts/NotoSansKannada.ttf").resolve())))
+
 def current_milli_time():
     return round(time.time() * 1000)
 
