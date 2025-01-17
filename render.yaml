@@ -6,8 +6,6 @@ services:
     buildCommand: ""
     startCommand: python app.py
     envVars:
-      - key: LC_ALL
-        value: en_US.UTF-8
       - key: LANG
         value: en_US.UTF-8
       - key: LANGUAGE

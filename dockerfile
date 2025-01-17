@@ -10,7 +10,6 @@ RUN apt-get update && apt-get install -y locales \
 # Set environment variables for locale
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
 
 # Set the working directory
 WORKDIR /app
