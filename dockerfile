@@ -18,5 +18,7 @@ WORKDIR /app
 # Copy your application code
 COPY . /app
 
+RUN locale -a
+
 # Command to run your app
 CMD ["python", "app.py"]
