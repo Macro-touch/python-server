@@ -11,9 +11,6 @@ RUN apt-get update && apt-get install -y locales \
     && locale-gen en_US.UTF-8 \
     && apt-get clean
 
-# Install other dependencies for your app
-RUN pip install -r requirements.txt
-
 # Set the working directory
 WORKDIR /app
 

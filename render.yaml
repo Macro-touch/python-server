@@ -3,5 +3,5 @@ services:
     name: my-app
     env: docker
     dockerfilePath: ./Dockerfile
-    buildCommand: pip install -r requirements.txt
+    buildCommand: ""
     startCommand: python app.py
