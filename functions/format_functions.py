@@ -71,12 +71,16 @@ def format_float(input_string: str, count=False):
 
 
 def chart_key(date):
-    seperator = "-" if "-" in date else " " if " " in date else "/"
+
+    if "/" in date and " " in date:
+        date = date.replace(" ", "")
+
+    separator = "-" if "-" in date else "/" if "/" in date else " "
 
     # for 26-OCT-2023 or 2 Sep 2023
-    if regex_functions.only_alpha(date) or (date.split(seperator)[1].isalpha() and date.split(seperator)[0].isnumeric()):
+    if regex_functions.only_alpha(date) or (date.split(separator)[1].isalpha() and date.split(separator)[0].isnumeric()):
         # Extract parts of the date
-        parts = date.split(seperator)
+        parts = date.split(separator)
         day = parts[0]  # Numeric day
         month = parts[1]  # Month as a word
         year = parts[2]  # Year
@@ -87,7 +91,7 @@ def chart_key(date):
 
     # for 26-10-2023
     else:
-        date = date.split(seperator)
+        date = date.split(separator)
 
         if date[1].isnumeric():
             month_key = MONTHS[int(date[1]) - 1][:3] + f" '{date[-1][-2:]}"
@@ -95,7 +99,7 @@ def chart_key(date):
 
         else:
             month_key = date[1] + f" '{date[-1][-2:]}"
-            date_key = date.split(seperator)[0] + "\n" + MONTHS[int(date[1]) - 1][:3]
+            date_key = date.split(separator)[0] + "\n" + MONTHS[int(date[1]) - 1][:3]
 
     return [month_key, date_key]
 
