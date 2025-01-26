@@ -81,9 +81,9 @@ def chart_key(date):
     if regex_functions.only_alpha(date) or (date.split(separator)[1].isalpha() and date.split(separator)[0].isnumeric()):
         # Extract parts of the date
         parts = date.split(separator)
-        day = parts[0]  # Numeric day
+        day   = parts[0]  # Numeric day
         month = parts[1]  # Month as a word
-        year = parts[2]  # Year
+        year  = parts[2]  # Year
 
         # Construct the keys
         month_key = month[:3] + f" '{year[-2:]}"  # Abbreviated month + last two digits of the year
@@ -146,7 +146,7 @@ def fetch_amount(raw_entry, trans_type, num_index):
     else:
         amount = raw_entry.get("AMOUNT") or raw_entry[list(raw_entry.keys())[num_index]]
 
-    return amount.replace(",", "")
+    return str(amount).replace(",", "")
 
 
 def find_transaction_type(raw: list):
@@ -172,6 +172,18 @@ def find_transaction_type(raw_entry, check_index) -> str:
     
     if raw_entry.get("DEPOSITS") is not None:
         amt = raw_entry.get("DEPOSITS")
+
+        if amt and float(amt.replace(',', '')) > 0:
+            return "CR"
+    
+    if raw_entry.get("WITHDRAWAL") is not None:
+        amt = raw_entry.get("WITHDRAWAL")
+
+        if amt and float(amt.replace(',', '')) > 0: 
+            return "DR"
+    
+    if raw_entry.get("DEPOSIT") is not None:
+        amt = raw_entry.get("DEPOSIT")
 
         if amt and float(amt.replace(',', '')) > 0:
             return "CR"
@@ -221,7 +233,7 @@ def convert_closing_balance(input_string: str):
 
 
 def find_desc(raw):
-    desc = r"" + (
+    desc = r"" + str(
         raw.get("PARTICULARS")
         or raw.get("DESCRIPTION")
         or raw.get("DETAILS")

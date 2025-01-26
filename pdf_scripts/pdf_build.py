@@ -54,7 +54,7 @@ def build_pdf(data, file_id, company_name):
 
     # Making Reports Directory
     pdf_files = [pdf_path]
-    report_dir = "Reports " + file_id
+    report_dir = "Reports"
     os.makedirs(report_dir, exist_ok=True)
 
     # Creating and merging the report file with table PDF
