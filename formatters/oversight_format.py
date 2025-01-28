@@ -29,10 +29,9 @@ class OversightFormat:
             2,
         )
 
-    def get_closure_table(self, header: list) -> list:
+    def get_closure_table(self) -> list:
 
         return [
-            header,
             ["Amount", self.amount_oversight["DR"][0], self.amount_oversight["CR"][0]],
             [
                 "Transaction",

@@ -13,35 +13,34 @@ from models.AttributeModel import AttributeModel
 def segregate(data: list[dict], lang:int):
 
     # #### Variables #### #
-    header = TABLE_HEADINGS["eng"]
-    CHARGES_LIST = ["CHG", header["CHG"]]
-    MOP_LIST = ["MOP", header["MOP"]]
+    CHARGES_LIST = []
+    MOP_LIST = []
     MOP_DICT = {}
 
     GOVT_LIST = {
-        "TDS": ["TDS", header["GOV"]],
-        "GRANT": ["GRANT", header["GOV"]],
-        "DEDUCTION": ["DEDUCTION", header["DED"]],
-        "TAX REFUND": ["REFUND", header["GOV"]],
-        "ADVANCE TAX": ["ADVTAX", header["GOV"]],
-        "EMI": ["EMI", header["GOV"]],
-        "CLOSURE": ["CLOSURE", header["GOV"]],
-        "INTEREST": ["INTEREST", header["INT"]],
+        "TDS": [],
+        "GRANT": [],
+        "DEDUCTION": [],
+        "TAX REFUND": [],
+        "ADVANCE TAX": [],
+        "EMI": [],
+        "CLOSURE": [],
+        "INTEREST": [],
     }
 
     UNUSUAL_SET = set()
-    UNUSUAL_LIST = ["UNT", header["UNT"]]
+    UNUSUAL_LIST = []
 
     DUPLICATE_SET = set()
-    DUPLICATE_LIST = ["DUP", header["UNT"]]
+    DUPLICATE_LIST = []
 
     ATTRIBUTES_DICT = {}
     DR_SORTED_ATTRIBUTES_DICT = []
     CR_SORTED_ATTRIBUTES_DICT = []
-    DR_SORTED_ATTRIBUTES_LIST = ["ATTR", header["ATTR"]]
+    DR_SORTED_ATTRIBUTES_LIST = []
     CR_SORTED_ATTRIBUTES_LIST = []
 
-    HIGH_VAL_TRANSACTION = ["HVT", header["HVT"]]
+    HIGH_VAL_TRANSACTION = []
     # #### Variables #### #
 
     closure_format = OversightFormat(data)
@@ -180,7 +179,7 @@ def segregate(data: list[dict], lang:int):
     for cr in CR_SORTED_ATTRIBUTES_DICT.values():
         CR_SORTED_ATTRIBUTES_LIST.append(list(cr.values()))
 
-    CLOSURE = closure_format.get_closure_table(header["CLS"])
+    CLOSURE = closure_format.get_closure_table()
 
     totals = closure_format.get_totals()
     TOTAL_OUTCOME = totals[0]
