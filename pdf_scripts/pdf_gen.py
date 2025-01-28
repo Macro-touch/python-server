@@ -60,9 +60,11 @@ def generate_pdf(
                 "EMI": GOVT_LIST.get('EMI'),
                 "GOVT. CLOSURE": GOVT_LIST.get('CLOSURE'),
                 "INTEREST": GOVT_LIST.get('INTEREST'),
-                "PIE_CHART": [chart.pie_debit(), chart.pie_credit()],
-                "LINE_CHART": line_chart_values,
                 "CLOSURE": CLOSURE,
+                "charts": {
+                    "PIE_CHART": [chart.pie_debit(), chart.pie_credit()],
+                    "LINE_CHART": line_chart_values,
+                }
             }
         ),
     }
