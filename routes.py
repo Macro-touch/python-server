@@ -11,6 +11,11 @@ from io import BytesIO
 pdf_routes = Blueprint("pdf_routes", __name__)
 
 
+@pdf_routes.route("/test", methods=["GET"])
+def test():
+    return '', 200
+
+    
 @pdf_routes.route("/upload-pdf", methods=["POST"])
 def upload_pdf():
     if "pdf_file" not in request.files:
@@ -45,92 +50,92 @@ def upload_pdf():
         )
 
 
-@pdf_routes.route("/create-pdf", methods=["POST"])
-def create_pdf():
+# @pdf_routes.route("/create-pdf", methods=["POST"])
+# def create_pdf():
 
-    # ######### Extract and validate parameters ######### #
-    try:
+#     # ######### Extract and validate parameters ######### #
+#     try:
 
-        try:
-            data = request.form.get("report", "{}")
-            lang = int(request.form.get("language", 0))
-            company_name = request.form.get("companyName")
-            file_id = request.form.get("output_name", "")
-            report = json.loads(json.loads(data))
+#         try:
+#             data = request.form.get("report", "{}")
+#             lang = int(request.form.get("language", 0))
+#             company_name = request.form.get("companyName")
+#             file_id = request.form.get("output_name", "")
+#             report = json.loads(json.loads(data))
 
-        except (ValueError, json.JSONDecodeError) as e:
-            return (
-                jsonify({"error": "Invalid JSON in 'report'", "details": str(e)}),
-                400,
-            )
+#         except (ValueError, json.JSONDecodeError) as e:
+#             return (
+#                 jsonify({"error": "Invalid JSON in 'report'", "details": str(e)}),
+#                 400,
+#             )
 
-        # ######### Proceeding to PDF Generation ######### #
-        try:
-            table_data = report.get("table_set1")
+#         # ######### Proceeding to PDF Generation ######### #
+#         try:
+#             table_data = report.get("table_set1")
 
-            # result_file_path = segregate(transactions, lang)
+#             # result_file_path = segregate(transactions, lang)
 
-            # ######### Proceeding to PDF Generation ######### #
-            # print(result_file_path, flush=True)
-            pdf_chunk = GeneratePDFChunk(
-                table_set1=[
-                    table_data[0],
-                    table_data[1],
-                    table_data[2],
-                    table_data[3],
-                    table_data[4],
-                    table_data[5],
-                ],
-                table_set2=report.get("table_set2"),
-                pie_data=report.get("pie_data"),
-                line_data=report.get("line_data"),
-                closure=report.get("closure"),
-                lang=lang
-            )
+#             # ######### Proceeding to PDF Generation ######### #
+#             # print(result_file_path, flush=True)
+#             pdf_chunk = GeneratePDFChunk(
+#                 table_set1=[
+#                     table_data[0],
+#                     table_data[1],
+#                     table_data[2],
+#                     table_data[3],
+#                     table_data[4],
+#                     table_data[5],
+#                 ],
+#                 table_set2=report.get("table_set2"),
+#                 pie_data=report.get("pie_data"),
+#                 line_data=report.get("line_data"),
+#                 closure=report.get("closure"),
+#                 lang=lang
+#             )
 
-            pdf_build_data = pdf_chunk.get_pdf_data()
-            result_file_path = build_pdf(pdf_build_data, file_id, company_name)
+#             pdf_build_data = pdf_chunk.get_pdf_data()
+#             result_file_path = build_pdf(pdf_build_data, file_id, company_name)
 
-            if result_file_path:
-                print("Successfully Generated!", flush=True)
+#             if result_file_path:
+#                 print("Successfully Generated!", flush=True)
 
-                with open(result_file_path, "rb") as file:
-                    pdf_bytes = file.read()
+#                 with open(result_file_path, "rb") as file:
+#                     pdf_bytes = file.read()
                 
-                pdf_stream = BytesIO(pdf_bytes)
+#                 pdf_stream = BytesIO(pdf_bytes)
 
-                @after_this_request
-                def remove_file(response):
-                    print("file removing processing...")
+#                 @after_this_request
+#                 def remove_file(response):
+#                     print("file removing processing...")
 
-                    try:
-                        os.remove(result_file_path)
-                        print(
-                            f"File {result_file_path} deleted successfully", flush=True
-                        )
+#                     try:
+#                         os.remove(result_file_path)
+#                         print(
+#                             f"File {result_file_path} deleted successfully", flush=True
+#                         )
 
-                    except Exception as e:
-                        print(f"Error deleting file: {e}", flush=True)
-                    return response
+#                     except Exception as e:
+#                         print(f"Error deleting file: {e}", flush=True)
+#                     return response
                 
-                return Response(pdf_stream, 
-                    mimetype='application/pdf', 
-                    headers={"Content-Disposition": "attachment;filename=report.pdf"})
-            else:
-                return jsonify({"error": "File generation failed"}), 500
+#                 return Response(pdf_stream, 
+#                     mimetype='application/pdf', 
+#                     headers={"Content-Disposition": "attachment;filename=report.pdf"})
+#             else:
+#                 return jsonify({"error": "File generation failed"}), 500
 
-        except Exception as e:
-            print(str(e), flush=True)
-            traceback.print_exc()
-            return (
-                jsonify({"error": "Error processing PDF", "details": str(e)}),
-                500,
-            )
+#         except Exception as e:
+#             print(str(e), flush=True)
+#             traceback.print_exc()
+#             return (
+#                 jsonify({"error": "Error processing PDF", "details": str(e)}),
+#                 500,
+#             )
 
-    except Exception as e:
-        print(str(e), flush=True)
-        traceback.print_exc()
-        return (
-            jsonify({"error": "Error processing PDF", "details": str(e)}),
-            500,
-        )
+#     except Exception as e:
+#         print(str(e), flush=True)
+#         traceback.print_exc()
+#         return (
+#             jsonify({"error": "Error processing PDF", "details": str(e)}),
+#             500,
+#         )
