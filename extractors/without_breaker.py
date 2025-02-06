@@ -1,6 +1,8 @@
 from typing import List, Tuple, Optional
 import re
 
+from functions.format_functions import contains_two_floats
+
 
 # all date format regex
 date_regex = re.compile(
@@ -32,7 +34,8 @@ HEADER_KEYWORDS = {
     "closing_balance": ["balance", "closing balance", "bal"],
 }
 
-exclude_list = ["value date", "chq.no."]
+value_date_possibilities = ["value date"]
+exclude_list = ["value date", "chq.no.", "ref.no.", "ref. no."]
 DR_CR_KEYWORDS = ["dr/cr", "cr/dr"]
 AMOUNT_KEYWORDS = ["amount", "txn amount", "txnamount", "trxn amount", "trxn amount"]
 
@@ -63,18 +66,18 @@ def is_header_row(
     :return: Tuple (is_header: bool, indices: dict) or None if not a header row.
     """
 
-    # Normalize to lowercase for comparison
-    row_lower = [r.lower() for r in row if r != "" and r != None]
     indices = {}
 
     # Find the index of each column type
     for key, keyword_list in keywords.items():
-        for i, cell in enumerate(row_lower):
-
+        for i, cell in enumerate(row):
+            
             # neglecting unwanted headers
-            if cell in exclude_list:
+            if cell is None or cell == "" or cell.lower() in exclude_list: 
                 continue
 
+            # Normalize to lowercase for comparison
+            cell = cell.lower()
             if key not in indices:
 
                 # Match keywords and avoid overwriting existing indices
@@ -82,18 +85,32 @@ def is_header_row(
                     indices[key] = i
                     break
 
-                # Fail Case: if the the entry contains 'CR/DR' rathar than actual format
+                # Fail Case: if the the entry contains 'CR/DR' rather than actual format
                 if any(cell in keyword for keyword in DR_CR_KEYWORDS):
                     amount_index = next(
                         (
                             i
-                            for i, cell in enumerate(row_lower)
-                            if cell in AMOUNT_KEYWORDS
+                            for i, cell in enumerate(row)
+                            if cell.lower() in AMOUNT_KEYWORDS
                         ),
                         None,
                     )
                     indices["amount"] = amount_index
                     indices["cr/dr"] = i
+
+
+    if len(indices.keys()) >= 3:
+        if "date" not in indices.keys():
+
+            for i, cell in enumerate(row):
+                
+                # neglecting unwanted headers
+                if cell is None or cell == "": 
+                    continue
+
+                if cell.lower() in value_date_possibilities:
+                    indices['date'] = i
+
 
     # Ensure all required columns (date, description, debit, credit) are present
     required_columns_1 = ["date", "description", "debit", "credit"]
@@ -216,6 +233,51 @@ def create_entry(row: List[str], indices: dict) -> dict:
     }
 
 
+    
+#        v   h
+# order: l - t,
+#        t - l,
+#        t - t,
+def find_strategy(first_page):
+    v_strategy = "lines"
+    h_strategy = "text"
+
+    # thresholds:
+    ACCEPTED_ROW_THRESHOLD = 4
+    ACCEPTED_LINES_THRESHOLD = 4
+
+
+    while h_strategy != v_strategy:
+
+        data = first_page.extract_table({
+            "vertical_strategy": v_strategy,
+            "horizontal_strategy": h_strategy,
+            "min_words_vertical": 12,
+        })
+
+        if data is not None and len(data) > 0:
+            accepted_lines = []
+            for row in data:
+                # checking if the rows are valid
+                if row is not None and len(list(row)) >= ACCEPTED_ROW_THRESHOLD:
+                    accepted_lines.append(row)
+            
+                if len(accepted_lines) > ACCEPTED_LINES_THRESHOLD:
+                    # Returning the strategies
+                    return [v_strategy, h_strategy]
+        
+        # Proceeding to the next strategy
+        if h_strategy == "text":
+            # Swapping the values (l, t -> t, l)
+            v_strategy, h_strategy = h_strategy, v_strategy
+
+        else:
+            # Final case
+            v_strategy = h_strategy = "text"
+
+    return [v_strategy, h_strategy]
+
+
 def without_breaker(pdf):
     header = []
     header_len = 0
@@ -224,18 +286,24 @@ def without_breaker(pdf):
     entry = {}
     entries: List[dict] = []
 
-    for page in pdf.pages:
-        tables = extract_table_strategy(page)
+    strategies = find_strategy(pdf.pages[0])
+    print(strategies)
 
-        # for t in tables:
-        #     print(t)
+    for page in pdf.pages:
+        tables = page.extract_table({
+            "vertical_strategy": strategies[0],
+            "horizontal_strategy": strategies[1],
+            "min_words_vertical": 12,
+        })
+
+        if tables is None:
+            continue
 
         for index, row in enumerate(tables):
 
             # capturing the header row & working on it
             # print(row)
-            if not header:
-
+            if len(header) == 0:
                 is_header, i = is_header_row(row)
                 if is_header:
                     header = row
@@ -244,6 +312,9 @@ def without_breaker(pdf):
                     # print(header)
                     # print(indeces)
                     continue
+
+            if not contains_two_floats(row): 
+                continue
 
             # capturing the entry row & working on it
             if row[0] != None and date_regex.match(row[0].lower()):
@@ -269,5 +340,6 @@ def without_breaker(pdf):
                     "description"
                 ] += f'{" " if (entry["description"][-1] != "-") and (row[desc_index][-1] != "-") and (not is_last_letter_same) else ""}{row[desc_index]}'
 
+        if entry: entries.append(entry)
 
     return entries

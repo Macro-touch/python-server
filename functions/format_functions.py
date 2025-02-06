@@ -155,6 +155,19 @@ def find_transaction_type(raw: list):
 
     return None
 
+def contains_two_floats(data:list[str]) -> bool:
+    count = 0
+    for item in data:
+        if item is not None:
+            try:
+            # Remove commas and attempt conversion to float
+                float(item.replace(',', ''))
+                count += 1
+                if count >= 2:
+                    return True
+            except ValueError:
+                continue
+    return False
 
 def find_transaction_type(raw_entry, check_index) -> str:
 
@@ -165,25 +178,25 @@ def find_transaction_type(raw_entry, check_index) -> str:
             return "DR" if str(raw_entry.get("TYPE")).lower() == "debit" else "CR"
         
     if raw_entry.get("WITHDRAWALS") is not None:
-        amt = raw_entry.get("WITHDRAWALS")
+        amt = str(raw_entry.get("WITHDRAWALS"))
 
         if amt and float(amt.replace(',', '')) > 0: 
             return "DR"
     
     if raw_entry.get("DEPOSITS") is not None:
-        amt = raw_entry.get("DEPOSITS")
+        amt = str(raw_entry.get("DEPOSITS"))
 
         if amt and float(amt.replace(',', '')) > 0:
             return "CR"
     
     if raw_entry.get("WITHDRAWAL") is not None:
-        amt = raw_entry.get("WITHDRAWAL")
+        amt = str(raw_entry.get("WITHDRAWAL"))
 
         if amt and float(amt.replace(',', '')) > 0: 
             return "DR"
     
     if raw_entry.get("DEPOSIT") is not None:
-        amt = raw_entry.get("DEPOSIT")
+        amt = str(raw_entry.get("DEPOSIT"))
 
         if amt and float(amt.replace(',', '')) > 0:
             return "CR"

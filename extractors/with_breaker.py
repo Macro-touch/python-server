@@ -1,4 +1,3 @@
-import json
 import re
 
 from functions.regex_functions import multiple_dates
@@ -36,26 +35,27 @@ def with_breaker(pdf):
 
     if tables:
         headers = tables[0]
-        table_data = [
-            {
-                headers[col]: (
-                    float(val)
-                    if val is not None and val.isdigit()
-                    else (
-                        val.split("\n")[0]
-                        if val is not None and bool(contains_new_line.match(val))
-                        else val
-                    )
-                )
-                for col, val in enumerate(row)
-                if headers[col]
-            }
-            for row in tables[1:]
-        ]
+        entry = {}
+        entries = []
 
-        # for t in table_data:
-        #     print(t)
+        for row in tables[1:]: 
+            i = 0
+            for col, val in enumerate(row):
+                if (val is not None or len(row) == len(headers)) and headers[i]:
+                    
+                    entry[headers[i]] = float(val) if val is not None and val.isdigit() else (
+                            val.split("\n")[0]
+                            if val is not None and bool(contains_new_line.match(val))
+                            else val
+                        )
+                    i = i + 1
 
-        return table_data
+            non_empty_count = sum(1 for value in entry.values() if value)
+                    
+            if(non_empty_count > 3):
+                entries.append(entry)
+                entry = {}
+            
+        return entries
 
     return []
