@@ -1,3 +1,4 @@
+import re
 from functions import regex_functions
 from constants.MONTHS import MONTHS
 
@@ -170,6 +171,10 @@ def contains_two_floats(data:list[str]) -> bool:
     return False
 
 def find_transaction_type(raw_entry, check_index) -> str:
+
+    if raw_entry.get("CR/DR") is not None:
+        return ''.join(re.findall(r'[a-zA-Z]', str(raw_entry.get("CR/DR")))).upper()
+
 
     if raw_entry.get("TYPE") is not None:
         if len(raw_entry.get("TYPE")) == 2:
