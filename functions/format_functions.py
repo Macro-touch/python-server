@@ -251,15 +251,13 @@ def convert_closing_balance(input_string: str):
 
 
 def find_desc(raw):
-    desc = r"" + str(
-        raw.get("PARTICULARS")
-        or raw.get("DESCRIPTION")
-        or raw.get("DETAILS")
-        or raw.get("NARRATION")
-    ).replace("\n", "")
+    keys = ["PARTICULARS", "DESCRIPTION", "DETAILS", "NARRATION"]
 
-    return desc
-
+    for key in keys:
+        if raw.get(key):
+            return [list(raw.keys()).index(key), str(raw.get(key))]
+        
+    return -1 
 
 def find_attr(raw_desc, transc_type):
 
@@ -311,20 +309,23 @@ def find_cheque_no_index(entry: dict) -> int:
             return list(entry.keys()).index(key)
 
 
-def find_first_float(obj):
+def find_first_float(obj, desc_index):
 
     cheque_index = find_cheque_no_index(obj)
 
     index = 0
     for key, value in obj.items():
-        try:
-            float_value = float(str(value).replace(",", ""))
+        if "." in str(value):
+            print(str(value))
+            try:
+                float_value = float(str(value).replace(",", ""))
 
-            if index != 0 and index != cheque_index and isinstance(float_value, float):
-                return index
+                if index != 0 and index != desc_index and index != cheque_index and isinstance(float_value, float):
+                    return index
 
-        except ValueError:
-            pass
+            except ValueError:
+                pass
 
         index += 1
+
     return index

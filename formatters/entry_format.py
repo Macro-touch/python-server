@@ -23,14 +23,18 @@ def format_entries(data) -> list[dict]:
 
     data = data_upper
     for raw_entry in data:
-        num_index = find_first_float(raw_entry)
 
         date = find_date(raw_entry)
         alpha_pattern = re.compile(r"\d+")
 
         if len(date) > 2 and bool(alpha_pattern.search(date)):
 
-            desc = find_desc(raw_entry)
+            found_desc = find_desc(raw_entry)
+            desc = found_desc[1]
+            desc_key = found_desc[0]
+            
+            num_index = find_first_float(raw_entry, desc_key)
+
             trans_type = find_transaction_type(raw_entry, num_index + 1)
             amount = fetch_amount(raw_entry, trans_type, num_index)
             attribute = extract_attribute(desc, trans_type)
