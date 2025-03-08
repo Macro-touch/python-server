@@ -316,7 +316,6 @@ def find_first_float(obj, desc_index):
     index = 0
     for key, value in obj.items():
         if "." in str(value):
-            print(str(value))
             try:
                 float_value = float(str(value).replace(",", ""))
 

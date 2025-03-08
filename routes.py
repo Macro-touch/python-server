@@ -7,6 +7,7 @@ import traceback
 from werkzeug.utils import secure_filename
 import json
 from io import BytesIO
+from segregate import segregate
 
 pdf_routes = Blueprint("pdf_routes", __name__)
 
@@ -49,6 +50,20 @@ def upload_pdf():
             500,
         )
 
+@pdf_routes.route("/merge-report", methods=["POST"])
+def create_pdf():
+    transactions = request.form.get("transactions", "")
+
+    try:
+        return segregate(transactions, 0), 200
+
+    except Exception as e:
+        traceback.print_exc()
+        return (
+            jsonify({"error": "An unexpected error occurred", "details": str(e)}),
+            500,
+        )
+    
 
 # @pdf_routes.route("/create-pdf", methods=["POST"])
 # def create_pdf():
