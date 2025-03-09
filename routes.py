@@ -52,7 +52,7 @@ def upload_pdf():
 
 @pdf_routes.route("/merge-report", methods=["POST"])
 def create_pdf():
-    transactions = request.form.get("transactions", "")
+    transactions = json.loads(request.form.get("transactions", ""))
 
     try:
         return segregate(transactions, 0), 200
