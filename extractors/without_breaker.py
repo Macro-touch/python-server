@@ -283,13 +283,14 @@ def without_breaker(pdf):
     header_len = 0
     indeces = {}
 
-    entry = {}
     entries: List[dict] = []
 
     strategies = find_strategy(pdf.pages[0])
     print(strategies)
 
     for page in pdf.pages:
+        entry = {}
+
         tables = page.extract_table({
             "vertical_strategy": strategies[0],
             "horizontal_strategy": strategies[1],
@@ -312,8 +313,10 @@ def without_breaker(pdf):
                     # print(header)
                     # print(indeces)
                     continue
+            
+            broken_desc = is_broken_desc_row(row)
 
-            if not contains_two_floats(row): 
+            if not contains_two_floats(row) and not broken_desc[0]: 
                 continue
 
             # capturing the entry row & working on it
@@ -331,8 +334,8 @@ def without_breaker(pdf):
                     entry["BALANCE"] = row[indeces.get("closing_balance")]
 
             # capturing the broken desc in the next lines and adding it to the last accounted entry
-            elif is_broken_desc_row(row)[0] and entry:
-                desc_index = is_broken_desc_row(row)[1]
+            elif broken_desc[0] and entry:
+                desc_index = broken_desc[1]
 
                 is_last_letter_same = entry["description"][-1] == row[desc_index][0]
 
@@ -340,6 +343,8 @@ def without_breaker(pdf):
                     "description"
                 ] += f'{" " if (entry["description"][-1] != "-") and (row[desc_index][-1] != "-") and (not is_last_letter_same) else ""}{row[desc_index]}'
 
-        if entry: entries.append(entry)
+        if entry: 
+            # print(entry)
+            entries.append(entry)
 
     return entries

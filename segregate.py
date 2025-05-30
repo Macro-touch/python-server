@@ -120,7 +120,7 @@ def segregate(data: list[dict], lang:int):
         # duplicate transaction
         duplicate = DuplicateModel(entry)
         if duplicate in DUPLICATE_SET:
-            if (DUPLICATE_LIST.count(duplicate) == 0):
+            if (DUPLICATE_LIST.count(model_entry) == 0):
                 DUPLICATE_LIST.append(model_entry)
 
             DUPLICATE_LIST.append(model_entry)

@@ -50,19 +50,20 @@ def upload_pdf():
             500,
         )
 
-@pdf_routes.route("/merge-report", methods=["POST"])
-def create_pdf():
-    transactions = json.loads(request.form.get("transactions", ""))
+# ======== Deprecated ===========
+# @pdf_routes.route("/merge-report", methods=["POST"])
+# def create_pdf():
+#     transactions = json.loads(request.form.get("transactions", ""))
 
-    try:
-        return segregate(transactions, 0), 200
+#     try:
+#         return segregate(transactions, 0), 200
 
-    except Exception as e:
-        traceback.print_exc()
-        return (
-            jsonify({"error": "An unexpected error occurred", "details": str(e)}),
-            500,
-        )
+#     except Exception as e:
+#         traceback.print_exc()
+#         return (
+#             jsonify({"error": "An unexpected error occurred", "details": str(e)}),
+#             500,
+#         )
     
 
 # @pdf_routes.route("/create-pdf", methods=["POST"])

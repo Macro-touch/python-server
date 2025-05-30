@@ -21,22 +21,20 @@ def charge_checker(input_string):
     return None
 
 
-def mop_checker(desc):
-
-    mode = None
+def mop_checker(desc) -> str:
 
     if re.search(r"UPI.*?(?=\s|$)", desc):
-        mode = "UPI"
+        return "UPI"
     elif re.search(r"IMPS.*?(?=\s|$)", desc):
-        mode = "IMPS"
+        return "IMPS"
     elif re.search(r"NEFT.*?(?=\s|$)", desc):
-        mode = "NEFT"
+        return "NEFT"
     elif re.search(r"CHQ.*?(?=\s|$)", desc):
-        mode = "CHQ"
+        return "CHQ"
     elif re.search(r"RTGS.*?(?=\s|$)", desc) or re.search(r"RTG.*?(?=\s|$)", desc):
-        mode = "RTGS"
+        return "RTGS"
 
-    return mode
+    return None
 
 
 def govt_checker(desc) -> str | None:
