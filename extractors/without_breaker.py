@@ -1,136 +1,91 @@
 from typing import List, Tuple, Optional
-import re
 
-from functions.format_functions import contains_two_floats
-
-
-# all date format regex
-date_regex = re.compile(
-    r"\b(?:\d{2}-\d{2}-\d{4}|\d{2}/\d{2}/\d{4}|\d{2}/\d{2}/\d{2}|\d{4}-\d{2}-\d{2}|\d{2}-\d{2}-\d{2}|\d{2}\.\d{2}\.\d{4}|\d{4}/\d{2}/\d{2}|\d{8}|\d{4}\.\d{2}\.\d{2}|\d{1,2}-(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*-\d{4}|\d{1,2}\s(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s\d{4}|\d{1,2}\s(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s\d{2}|\d{1,2}\s(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*,?\s\d{4}|\d{1,2}\s(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*|\d{4}/\d{2}/\d{2})\b"
-)
+from functions.format_functions import valid_entry, is_float
+from functions.regex_functions import is_date
 
 # Define configurable keyword lists
 HEADER_KEYWORDS = {
     "date": ["date", "txn date", "txndate", "transaction date", "transactiondate"],
-    "description": ["particulars", "description", "narration"],
-    "debit": [
-        "debits",
-        "withdrawal",
-        "withdrawals",
-        "dr",
-        "debit amount",
-        "debitamount",
-        "withdrawalamt.",
-    ],
-    "credit": [
-        "credits",
-        "deposit",
-        "deposits",
-        "cr",
-        "credit amount",
-        "creditamount",
-        "depositamt.",
-    ],
-    "closing_balance": ["balance", "closing balance", "bal"],
+    "description": ["particulars", "description", "narration", "transaction reference"],
+    "debit": {
+        "debit", "debits", "withdrawal", "withdrawals", "withdrawl",
+        "dr", "debit amount", "debitamount", "withdrawalamt.",
+    },
+    "credit": { "credit", "credits", "deposit", "deposits",
+                "cr", "credit amount", "creditamount", "depositamt."
+    },
+    "closing_balance": {"balance", "closing balance", "bal"},
 }
 
-value_date_possibilities = ["value date"]
-exclude_list = ["value date", "chq.no.", "ref.no.", "ref. no."]
-DR_CR_KEYWORDS = ["dr/cr", "cr/dr"]
-AMOUNT_KEYWORDS = ["amount", "txn amount", "txnamount", "trxn amount", "trxn amount"]
+VALUE_DATE_KEYWORDS = {"value date"}
+EXCLUDE_KEYWORDS = {"value date", "chq.no.", "ref.no.", "ref. no.", "ref.No./chq.No.", "chq. / ref. No"}
+DR_CR_KEYWORDS = {"dr/cr", "cr/dr"}
+AMOUNT_KEYWORDS = {"amount", "txn amount", "txnamount", "trxn amount", "trxn amount"}
 
-
-def is_valid_amount(amount: str) -> bool:
-    """
-    Returns True when an amount is valid (greater than 0)
-    """
-    amt = amount
-
-    if amt == "":
-        return False
-
-    if amt.count(",") > 0:
-        amt = amt.replace(",", "")
-
-    return float(amt) > 0
-
+from typing import List, Optional, Tuple
 
 def is_header_row(
     row: List[str],
     keywords: dict = HEADER_KEYWORDS,
-) -> Optional[Tuple[bool, dict, int]]:
+) -> Optional[Tuple[bool, dict]]:
     """
     Check if a row is a header row and return the indices of relevant columns.
     :param row: List of strings representing a row.
-    :param keywords: Dictionary of keyword lists for each column type.
-    :return: Tuple (is_header: bool, indices: dict) or None if not a header row.
+    :param keywords: Dictionary of keyword sets for each column type.
+    :return: Tuple (is_header: bool, indices: dict) or (False, {}) if not a header row.
     """
-
     indices = {}
 
-    # Find the index of each column type
-    for key, keyword_list in keywords.items():
-        for i, cell in enumerate(row):
-            
-            # neglecting unwanted headers
-            if cell is None or cell == "" or cell.lower() in exclude_list: 
-                continue
+    # Normalize row and handle None values
+    normalized_row = [
+        cell.lower().strip() if isinstance(cell, str) else ""
+        for cell in row if cell is not None
+    ]
 
-            # Normalize to lowercase for comparison
-            cell = cell.lower()
-            if key not in indices:
+    for i, cell in enumerate(normalized_row):
+        if not cell or cell in EXCLUDE_KEYWORDS:
+            continue
 
-                # Match keywords and avoid overwriting existing indices
-                if any(cell in keyword for keyword in keyword_list):
-                    indices[key] = i
-                    break
+        # First: Handle CR/DR format case
+        if cell in DR_CR_KEYWORDS:
+            indices["cr/dr"] = i
+            amount_index = next(
+                (j for j, c in enumerate(normalized_row) if c in AMOUNT_KEYWORDS),
+                None,
+            )
+            if amount_index is not None:
+                indices["amount"] = amount_index
+            continue
 
-                # Fail Case: if the the entry contains 'CR/DR' rather than actual format
-                if any(cell in keyword for keyword in DR_CR_KEYWORDS):
-                    amount_index = next(
-                        (
-                            i
-                            for i, cell in enumerate(row)
-                            if cell.lower() in AMOUNT_KEYWORDS
-                        ),
-                        None,
-                    )
-                    indices["amount"] = amount_index
-                    indices["cr/dr"] = i
+        # Now handle header keyword categories
+        for key, keyword_set in keywords.items():
+            if key not in indices and cell in keyword_set:
+                indices[key] = i
+                break  # no need to check other keys for this cell
 
+    # Handle missing 'date' with fallback to 'value date'
+    if "date" not in indices:
+        for i, cell in enumerate(normalized_row):
+            if cell in VALUE_DATE_KEYWORDS:
+                indices["date"] = i
+                break
 
-    if len(indices.keys()) >= 3:
-        if "date" not in indices.keys():
+    # Determine if the row qualifies as a header
+    required_set_1 = {"date", "description", "debit", "credit"}
+    required_set_2 = {"date", "description", "cr/dr"}
 
-            for i, cell in enumerate(row):
-                
-                # neglecting unwanted headers
-                if cell is None or cell == "": 
-                    continue
+    is_header = required_set_1.issubset(indices) or required_set_2.issubset(indices)
 
-                if cell.lower() in value_date_possibilities:
-                    indices['date'] = i
+    if is_header: print(indices)
 
-
-    # Ensure all required columns (date, description, debit, credit) are present
-    required_columns_1 = ["date", "description", "debit", "credit"]
-    required_columns_2 = ["date", "description", "dr/cr"]
-    is_header = all(key in indices for key in required_columns_1) or all(
-        key in indices for key in required_columns_2
-    )
-
-    # Return results only if required columns are found
-    if is_header:
-        return True, indices
-
-    return False, {}
+    return (True, indices) if is_header else (False, {})
 
 
 def find_header_len(row: List[str]) -> int:
     """
     Finds the number of empty string presented in the header row.
     """
-    return len(row) - row.count("")
+    return len(row) - row.count("") - row.count(None)
 
 
 def is_broken_desc_row(row: List[str]) -> Optional[Tuple[bool, int]]:
@@ -155,12 +110,16 @@ def clean_row(row: List[str], header_len: int, indeces: dict) -> List[str]:
     """
     Cleans a row by removing excessive empty strings and fixing broken descriptions.
     """
-
-    if len(row) > header_len:
+    
+    while len(row) > header_len:
+        # Remove excessive Nones:
+        if row.count(None) > 0:
+            row.remove(None)
 
         # Remove excessive empty strings
         if row.count("") > 2:
-            row.pop(row.index(""))
+            row.remove("")
+            continue
 
         # Join broken description if length still exceeds header length
         if len(row) > header_len:
@@ -168,14 +127,15 @@ def clean_row(row: List[str], header_len: int, indeces: dict) -> List[str]:
             desc_index = indeces.get("description")
             broken_row_desc = row[desc_index + 1]
 
-            if 1 < len(broken_row_desc) <= 10:
+            if broken_row_desc is not None and 1 < len(broken_row_desc) <= 10:
                 row[desc_index] = row[desc_index] + " " + broken_row_desc
                 row.pop(desc_index + 1)
+            continue
 
-    # Removing any excessive empty strings if still exists
-    if len(row) > header_len:
-        if row.count("") > 1:
-            row.pop(row.index(""))
+         # Removing any excessive empty strings if still exists
+        if len(row) > header_len:
+            if row.count("") > 1:
+                row.pop(row.index(""))
 
     return row
 
@@ -218,15 +178,17 @@ def create_entry(row: List[str], indices: dict) -> dict:
         "description": row[indices.get("description")],
         "type": (
             row[indices.get("cr/dr")].upper()
-            if indices.get("cr/dr")
-            else ("CR" if is_valid_amount(row[indices.get("credit")]) else "DR")
+            if "cr/dr" in indices
+            else "CR" 
+                if "credit" in indices and is_float(row[indices.get("credit")]) 
+                else "DR"
         ),
         "amount": (
             row[indices.get("amount")]
-            if indices.get("amount")
+            if "amount" in indices
             else (
                 row[indices.get("credit")]
-                if is_valid_amount(row[indices.get("credit")])
+                if is_float(row[indices.get("credit")])
                 else row[indices.get("debit")]
             )
         ),
@@ -316,11 +278,12 @@ def without_breaker(pdf):
             
             broken_desc = is_broken_desc_row(row)
 
-            if not contains_two_floats(row) and not broken_desc[0]: 
+            if not valid_entry(row) and not broken_desc[0]: 
+                # print(row)
                 continue
 
             # capturing the entry row & working on it
-            if row[0] != None and date_regex.match(row[0].lower()):
+            if row[0] != None and is_date(row[0]):
 
                 if entry:
                     entries.append(entry)
@@ -328,10 +291,10 @@ def without_breaker(pdf):
 
                 row = clean_row(row, header_len, indeces)
                 entry = create_entry(row, indeces)
-                # print(row)
+                print(row)
 
-                if "closing_balance" in indeces:
-                    entry["BALANCE"] = row[indeces.get("closing_balance")]
+                # if "closing_balance" in indeces:
+                #     entry["BALANCE"] = row[indeces.get("closing_balance")]
 
             # capturing the broken desc in the next lines and adding it to the last accounted entry
             elif broken_desc[0] and entry:
@@ -346,5 +309,8 @@ def without_breaker(pdf):
         if entry: 
             # print(entry)
             entries.append(entry)
+        
+    # for e in entries:
+    #     print(e)
 
     return entries

@@ -1,8 +1,14 @@
 import re
+from re import Match
+
 from data.regex_patterns import keyword_pattern
+from data.regex_patterns import date_regex
 
+def is_date(input_str) -> bool | Match[str] | None | Match[bytes]:
+    if input_str is None: return False
+    return re.match(date_regex, input_str.lower())
 
-def isAmount(input_str):
+def is_amount(input_str):
     pattern = r"^[0-9.]+$"
     match = re.match(pattern, input_str)
     return bool(match)
