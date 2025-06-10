@@ -56,8 +56,8 @@ def process_pdf(file, password, output_name):
 
     return segregate(format_entries(formatted_entry), 0)
 
-process_pdf(
-    "statements/lvb.pdf",
-    "",
-    "report",
-)
+# process_pdf(
+#     "statements/lvb.pdf",
+#     "",
+#     "report",
+# )
