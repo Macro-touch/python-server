@@ -47,6 +47,6 @@ def format_entries(data) -> list[dict]:
                 "attribute": attribute,
             }
             entries.append(entry)
-            print(entry, flush=True)
+            # print(entry, flush=True)
 
     return entries

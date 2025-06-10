@@ -33,7 +33,8 @@ def extract_data(pdf_path):
             try:
                 table_data = without_breaker(pdf)
 
-            except Exception:
+            except (IndexError, ValueError) as e:
+                print(e)
                 table_data = extract_bank_entries(pdf_path)
 
         return table_data
@@ -43,19 +44,20 @@ def process_pdf(file, password, output_name):
     decrypted_file = decrypt_pdf(file, password, output_name)
     data = extract_data(decrypted_file)
     os.remove(decrypted_file)
-    
+
     formatted_entry = None
     try:
         formatted_entry = format_entries(data)
 
-    except Exception:
+    except (IndexError, ValueError) as e:
+        print(e)
         data = extract_bank_entries(decrypted_file)
         formatted_entry = format_entries(data)
 
     return segregate(format_entries(formatted_entry), 0)
 
-# process_pdf(
-#     "statements/bob.pdf",
-#     "",
-#     "report",
-# )
+process_pdf(
+    "statements/lvb.pdf",
+    "",
+    "report",
+)

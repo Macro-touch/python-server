@@ -291,7 +291,7 @@ def without_breaker(pdf):
 
                 row = clean_row(row, header_len, indeces)
                 entry = create_entry(row, indeces)
-                print(row)
+                # print(row)
 
                 # if "closing_balance" in indeces:
                 #     entry["BALANCE"] = row[indeces.get("closing_balance")]
