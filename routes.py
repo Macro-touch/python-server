@@ -1,7 +1,9 @@
+import os
+import hashlib
+import traceback
+
 from flask import Blueprint, request, jsonify
 from scripts.processor import process_pdf
-import os
-import traceback
 from werkzeug.utils import secure_filename
 
 pdf_routes = Blueprint("pdf_routes", __name__)
@@ -33,6 +35,9 @@ def upload_pdf():
         # Secure the filename
         pdf_path = os.path.join(upload_dir, secure_filename(pdf_file.filename))
         pdf_file.save(pdf_path)
+        file_bytes = pdf_file.read()
+        print("SHA256:", hashlib.sha256(file_bytes).hexdigest(), flush=True)
+        pdf_file.seek(0)
 
         # Process the PDF
         result_json = process_pdf(pdf_path, password, "result")
