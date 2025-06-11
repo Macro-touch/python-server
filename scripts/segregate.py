@@ -1,16 +1,15 @@
-from constants.TABLE_HEADINGS import TABLE_HEADINGS
 from formatters.charge_format import format_charge
 from formatters.ded_format import deduct_format
 from formatters.govt_format import format_govt
 from formatters.oversight_format import OversightFormat
 from functions import transaction_functions
-from pdf_scripts.pdf_gen import generate_pdf
+from scripts.pdf_data_gen import generate_pdf_data
 from models.DuplicateModel import DuplicateModel
 from models.UnusualModel import UnusualModel
 from models.AttributeModel import AttributeModel
 
 
-def segregate(data: list[dict], lang:int):
+def segregate(data: list[dict]):
 
     # #### Variables #### #
     CHARGES_LIST = []
@@ -198,7 +197,7 @@ def segregate(data: list[dict], lang:int):
 
     # print({"a": DR_SORTED_ATTRIBUTES_LIST})
 
-    return generate_pdf(
+    return generate_pdf_data(
         data,
         DR_SORTED_ATTRIBUTES_LIST,
         CR_SORTED_ATTRIBUTES_LIST,
@@ -213,5 +212,4 @@ def segregate(data: list[dict], lang:int):
         DUPLICATE_LIST,
         GOVT_LIST,
         CLOSURE,
-        lang
     )

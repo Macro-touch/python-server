@@ -3,11 +3,11 @@ import json
 import PyPDF2
 import os
 
-from formatters.entry_format import format_entries
 from extractors.without_breaker import without_breaker
 from extractors.with_breaker import with_breaker
 from extractors.final_extractor import extract_bank_entries
-from segregate import segregate
+from formatters.entry_format import format_entries
+from scripts.segregate import segregate
 
 
 def decrypt_pdf(file, password, output_name):
@@ -54,7 +54,7 @@ def process_pdf(file, password, output_name):
         data = extract_bank_entries(decrypted_file)
         formatted_entry = format_entries(data)
 
-    return segregate(format_entries(formatted_entry), 0)
+    return segregate(format_entries(formatted_entry))
 
 # process_pdf(
 #     "statements/lvb.pdf",
