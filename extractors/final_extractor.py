@@ -49,6 +49,7 @@ def find_header_positions(pdf_path):
                         'x1': word['x1']
                     }
 
+    print("header_positions: ", header_positions, flush=True)
     return header_positions
 
 
