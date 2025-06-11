@@ -95,6 +95,7 @@ def extract_bank_entries(pdf_path):
             # Step 1: group words by row (by 'top')
             rows = defaultdict(list)
             for word in words:
+                print(word, flush=True)
                 top_key = round(word['top'] / 3) * 3  # cluster nearby rows
                 rows[top_key].append(word)
 
@@ -142,7 +143,7 @@ def extract_bank_entries(pdf_path):
                         "type": trans_type,
                         "closing_balance": columns["closing_balance"]
                     }
-                    print(entry, flush=True)
+                    # print(entry, flush=True)
                     all_entries.append(entry)
                     last_entry = entry
 

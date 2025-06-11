@@ -28,7 +28,7 @@ def format_entries(data) -> list[dict]:
         alpha_pattern = re.compile(r"\d+")
 
         if len(date) > 2 and bool(alpha_pattern.search(date)):
-            print(raw_entry, flush=True)
+            # print(raw_entry, flush=True)
             found_desc = find_desc(raw_entry)
             desc = found_desc[1]
             desc_key = found_desc[0]
