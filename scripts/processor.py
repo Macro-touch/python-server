@@ -34,6 +34,7 @@ def extract_data(pdf_path):
                 table_data = without_breaker(pdf)
 
             except (IndexError, ValueError) as e:
+                print("Extraction using without breaker failed: ", e, flush=True)
                 table_data = extract_bank_entries(pdf_path)
 
         return table_data
@@ -46,7 +47,8 @@ def process_pdf(file, password, output_name):
         data = extract_data(decrypted_file)
         formatted_entry = format_entries(data)
 
-    except (IndexError, ValueError):
+    except (IndexError, ValueError) as e:
+        print("Formatting entries failed: ", e, flush=True)
         data = extract_bank_entries(decrypted_file)
         formatted_entry = format_entries(data)
 

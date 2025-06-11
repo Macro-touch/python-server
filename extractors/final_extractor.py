@@ -141,6 +141,7 @@ def extract_bank_entries(pdf_path):
                         "type": trans_type,
                         "closing_balance": columns["closing_balance"]
                     }
+                    print(entry, flush=True)
                     all_entries.append(entry)
                     last_entry = entry
 
