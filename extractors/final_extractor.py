@@ -37,7 +37,12 @@ def find_header_positions(pdf_path):
     header_positions = {}
     with pdfplumber.open(pdf_path) as pdf:
         first_page = pdf.pages[0]
-        words = first_page.extract_words()
+        words = first_page.extract_words(
+                        x_tolerance=0.5, 
+                        y_tolerance=3, 
+                        use_text_flow=True, 
+                        keep_blank_chars=True
+                    )
 
         for word in words:
             norm_word = normalize(word['text'])
@@ -90,7 +95,12 @@ def extract_bank_entries(pdf_path):
 
     with pdfplumber.open(pdf_path) as pdf:
         for page in pdf.pages:
-            words = page.extract_words(use_text_flow=True, keep_blank_chars=True)
+            words = page.extract_words(
+                        x_tolerance=0.5, 
+                        y_tolerance=3, 
+                        use_text_flow=True, 
+                        keep_blank_chars=True
+                    )
 
             # Step 1: group words by row (by 'top')
             rows = defaultdict(list)
