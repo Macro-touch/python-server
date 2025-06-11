@@ -32,9 +32,8 @@ def extract_data(pdf_path):
         if json.dumps(table_data) == "[]":
             try:
                 table_data = without_breaker(pdf)
-
             except (IndexError, ValueError) as e:
-                print(e)
+                print("Error during without_breaker:", e)
                 table_data = extract_bank_entries(pdf_path)
 
         return table_data
@@ -42,19 +41,18 @@ def extract_data(pdf_path):
 
 def process_pdf(file, password, output_name):
     decrypted_file = decrypt_pdf(file, password, output_name)
-    data = extract_data(decrypted_file)
-    os.remove(decrypted_file)
 
-    formatted_entry = None
     try:
+        data = extract_data(decrypted_file)
         formatted_entry = format_entries(data)
-
     except (IndexError, ValueError) as e:
-        print(e)
+        print("Error during first extraction or formatting:", e)
         data = extract_bank_entries(decrypted_file)
         formatted_entry = format_entries(data)
+    finally:
+        os.remove(decrypted_file)
 
-    return segregate(format_entries(formatted_entry))
+    return segregate(formatted_entry)
 
 # process_pdf(
 #     "statements/lvb.pdf",
