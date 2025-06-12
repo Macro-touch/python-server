@@ -11,16 +11,16 @@ from scripts.segregate import segregate
 
 
 def decrypt_pdf(file, password, output_name):
-    pdf_reader = PyPDF2.PdfReader(open(file, "rb"))
-    if pdf_reader.is_encrypted:
-        pdf_reader.decrypt(password)
-        pdf_writer = PyPDF2.PdfWriter()
-        for page in pdf_reader.pages:
-            pdf_writer.add_page(page)
-        decrypted_file_path = f"decrypted_{output_name}.pdf"
-        with open(decrypted_file_path, "wb") as decrypted_file:
-            pdf_writer.write(decrypted_file)
-        return decrypted_file_path
+    # pdf_reader = PyPDF2.PdfReader(open(file, "rb"))
+    # if pdf_reader.is_encrypted:
+    #     pdf_reader.decrypt(password)
+    #     pdf_writer = PyPDF2.PdfWriter()
+    #     for page in pdf_reader.pages:
+    #         pdf_writer.add_page(page)
+    #     decrypted_file_path = f"decrypted_{output_name}.pdf"
+    #     with open(decrypted_file_path, "wb") as decrypted_file:
+    #         pdf_writer.write(decrypted_file)
+    #     return decrypted_file_path
 
     return file
 
@@ -52,8 +52,8 @@ def process_pdf(file, password, output_name):
         data = extract_bank_entries(decrypted_file)
         formatted_entry = format_entries(data)
 
-    finally:
-        os.remove(decrypted_file)
+    # finally:
+    #     os.remove(decrypted_file)
 
     return segregate(formatted_entry)
 
