@@ -62,7 +62,7 @@ def upload_pdf():
         file_stream = io.BytesIO(file_bytes)
 
         # Process the PDF
-        result_json = process_pdf(file_stream, password, "result")
+        result_json = process_pdf(file_stream)
         return jsonify(result_json), 200
 
     except Exception as e:
