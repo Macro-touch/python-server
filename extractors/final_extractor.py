@@ -54,7 +54,6 @@ def find_header_positions(pdf_path):
                         'x1': word['x1']
                     }
 
-    print("header_positions: ", header_positions, flush=True)
     return header_positions
 
 
@@ -105,7 +104,6 @@ def extract_bank_entries(pdf_path):
             # Step 1: group words by row (by 'top')
             rows = defaultdict(list)
             for word in words:
-                print(word, flush=True)
                 top_key = round(word['top'] / 3) * 3  # cluster nearby rows
                 rows[top_key].append(word)
 

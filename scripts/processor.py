@@ -24,19 +24,15 @@ def extract_data(pdf_path):
 
 
 def process_pdf(file):
+    data = extract_data(file)
+
     try:
-        data = extract_data(file)
         formatted_entry = format_entries(data)
 
     except Exception as e:
         print("Formatting entries failed: ", e, flush=True)
-        data = extract_bank_entries(file)
-        formatted_entry = format_entries(data)
+        return {}
 
     return segregate(formatted_entry)
 
-# process_pdf(
-#     "statements/lvb.pdf",
-#     "",
-#     "report",
-# )
+# process_pdf("statements/lvb.pdf")
