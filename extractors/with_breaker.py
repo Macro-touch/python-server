@@ -14,7 +14,7 @@ def with_breaker(pdf):
         rows = page.extract_table()
 
         if rows is None:
-            return []
+            continue
 
         rows_count = len(rows)
         if rows:
