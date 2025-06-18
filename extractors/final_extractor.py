@@ -13,6 +13,8 @@ HEADER_KEYWORDS = {
     "credit": { "credit", "credits", "deposit amt" , "deposit", "deposits", "depositamt",
                 "cr", "credit amount", "creditamount", "depositamt."
     },
+    "amount": {"amount", "amt", "trxn amount", "trxnamount"},
+    "type": {"type", "txn type", "txntype", "dr/cr", "cr/dr", "transaction type"},
     "closing_balance": {"balance", "closingbalance", "closing balance", "bal"},
     "value date": {"Value Dt", "ValueDt", "value date"},
     "ref. no.": {"chq.no.", "ref.no.", "ref. no.", "ref.No./chq.No.", "chq. / ref. No", "Chq./Ref.No."},
@@ -111,6 +113,7 @@ def extract_bank_entries(pdf_path):
                 columns = {
                     "date": "", "description": "",
                     "debit": "", "credit": "",
+                    "amount": "", "type": "",
                     "closing_balance": ""
                 }
 
@@ -139,10 +142,20 @@ def extract_bank_entries(pdf_path):
                 elif columns["debit"] and not columns["credit"]:
                     trans_type = "debit"
                     amount = columns["debit"]
+                elif columns["amount"] and columns["type"]:
+                    trans_type = columns["type"].lower()
+                    if "cr" in trans_type or "credit" in trans_type:
+                        trans_type = "credit"
+                    elif "dr" in trans_type or "debit" in trans_type:
+                        trans_type = "debit"
+                    else:
+                        trans_type = "unknown"
+                    amount = columns["amount"]
                 else:
                     trans_type = "unknown"
                     amount = ""
 
+                # Valid entry
                 if is_date(columns["date"]):
                     entry = {
                         "date": columns["date"],

@@ -13,7 +13,9 @@ HEADER_KEYWORDS = {
     },
     "credit": { "credit", "credits", "deposit", "deposits",
                 "cr", "credit amount", "creditamount", "depositamt."
-    },
+    }, 
+    "amount": {"amount", "amt", "trxn amount", "trxnamount"},
+    "type": {"type", "txn type", "txntype", "dr/cr", "cr/dr", "transaction type"},
     "closing_balance": {"balance", "closing balance", "bal"},
 }
 
@@ -76,7 +78,7 @@ def is_header_row(
 
     is_header = required_set_1.issubset(indices) or required_set_2.issubset(indices)
 
-    if is_header: print(indices)
+    # if is_header: print(indices)
 
     return (True, indices) if is_header else (False, {})
 
@@ -275,7 +277,7 @@ def without_breaker(pdf):
                     # print(header)
                     # print(indeces)
                     continue
-            
+                
             broken_desc = is_broken_desc_row(row)
 
             if not valid_entry(row) and not broken_desc[0]: 
@@ -283,7 +285,7 @@ def without_breaker(pdf):
                 continue
 
             # capturing the entry row & working on it
-            if row[0] != None and is_date(row[0]):
+            if row[0] != None and is_date(row[indeces.get("date")]):
 
                 if entry:
                     entries.append(entry)

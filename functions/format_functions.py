@@ -300,7 +300,7 @@ def convert_closing_balance(input_string: str):
 
 
 def find_desc(raw):
-    keys = ["PARTICULARS", "DESCRIPTION", "DETAILS", "NARRATION"]
+    keys = ["PARTICULARS", "DESCRIPTION", "DETAILS", "NARRATION", "REMARKS"]
 
     for key in keys:
         if raw.get(key):
