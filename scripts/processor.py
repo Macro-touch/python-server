@@ -10,16 +10,20 @@ from scripts.segregate import segregate
 
 def extract_data(pdf_path):
     with pdfplumber.open(pdf_path) as pdf:
+        method = "with_breaker"
         table_data = with_breaker(pdf)
 
         if json.dumps(table_data) == "[]":
             try:
+                method = "without_breaker"
                 table_data = without_breaker(pdf)
 
             except Exception as e:
+                method = "ternary"
                 print("Extraction using without breaker failed: ", e, flush=True)
                 table_data = extract_bank_entries(pdf_path)
 
+        print(method)
         return table_data
 
 
@@ -34,5 +38,3 @@ def process_pdf(file):
         return {}
 
     return segregate(formatted_entry)
-
-# process_pdf("statements/lvb.pdf")

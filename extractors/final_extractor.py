@@ -169,7 +169,3 @@ def extract_bank_entries(pdf_path):
                     last_entry = entry
 
     return all_entries
-
-# entries = extract_bank_entries("../statements/t4.pdf")
-# for e in entries:
-#     print(e)
