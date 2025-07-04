@@ -1,48 +1,48 @@
+import io
 import traceback
 import requests
-import io
-
-from flask import Blueprint, request, jsonify
+from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 from scripts.processor import process_pdf
 
-pdf_routes = Blueprint("pdf_routes", __name__)
+pdf_routes = APIRouter()
 
+# Pydantic model for request body
+class PDFUploadRequest(BaseModel):
+    pdf_file: str  # URL
+    password: str = ""
 
-@pdf_routes.route("/test", methods=["GET"])
+@pdf_routes.get("/test")
 def test():
-    return '', 200
+    return {"status": "ok"}
 
-    
-@pdf_routes.route("/upload-pdf", methods=["POST"])
-def upload_pdf():
+@pdf_routes.post("/upload-pdf")
+def upload_pdf(payload: PDFUploadRequest):
+    print("Pdf Received, Request started...")
     try:
-        data = request.get_json()
-        if not data:
-            return jsonify({"error": "Invalid JSON payload"}), 400
-
-        pdf_url = data.get("pdf_file")
-        password = data.get("password", "")
+        pdf_url = payload.pdf_file
+        password = payload.password
 
         if not pdf_url:
-            return jsonify({"error": "No PDF URL provided"}), 400
+            raise HTTPException(status_code=400, detail="No PDF URL provided")
 
-        # Download the file from the URL
         response = requests.get(pdf_url)
         if response.status_code != 200:
-            return jsonify({"error": "Failed to download PDF file"}), 400
+            raise HTTPException(status_code=400, detail="Failed to download PDF file")
 
-        file_bytes = response.content
+        file_stream = io.BytesIO(response.content)
 
-        # In-memory file stream
-        file_stream = io.BytesIO(file_bytes)
-
+        print("PDF converted to bytes and moved to processing successfully...")
         # Process the PDF
         result_json = process_pdf(file_stream)
-        return jsonify(result_json), 200
 
+        return result_json
+
+    except HTTPException:
+        raise
     except Exception as e:
         traceback.print_exc()
-        return (
-            jsonify({"error": "An unexpected error occurred", "details": str(e)}),
-            500,
+        raise HTTPException(
+            status_code=500,
+            detail=f"Unexpected error: {str(e)}"
         )

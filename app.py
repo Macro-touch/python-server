@@ -1,10 +1,12 @@
-from flask import Flask
+from fastapi import FastAPI
 from routes import pdf_routes
 
-app = Flask(__name__)
+app = FastAPI()
 
-# Register the PDF processing routes
-app.register_blueprint(pdf_routes)
+# Include the PDF processing routes
+app.include_router(pdf_routes)
 
-if __name__ == "__main__":
-    app.run(debug=True, port=8050, host="0.0.0.0")
+# Optional root path
+@app.get("/")
+def root():
+    return {"message": "FastAPI is running"}

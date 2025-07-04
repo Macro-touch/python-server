@@ -28,13 +28,16 @@ def extract_data(pdf_path):
 
 
 def process_pdf(file):
+    print("Processing pdf...")
     data = extract_data(file)
 
     try:
+        print("Formatting processed data...")
         formatted_entry = format_entries(data)
 
     except Exception as e:
         print("Formatting entries failed: ", e, flush=True)
         return {}
 
+    print("Segregating formatted data...")
     return segregate(formatted_entry)
