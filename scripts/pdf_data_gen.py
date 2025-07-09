@@ -32,6 +32,7 @@ def generate_pdf_data(
     cr_values = [month_data["CR"] for month_data in line_chart_data[0].values()]
     line_chart_values = [[dr_values, cr_values], line_chart_data[1]]  # points  # Labels
 
+    print("Returning Data")
     return {
         "transactions": data,
         "report": json.dumps(

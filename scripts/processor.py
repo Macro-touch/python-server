@@ -8,7 +8,7 @@ from formatters.entry_format import format_entries
 from scripts.segregate import segregate
 
 
-def extract_data(pdf_path):
+def extract_data(pdf_path: str):
     with pdfplumber.open(pdf_path) as pdf:
         method = "with_breaker"
         table_data = with_breaker(pdf)
@@ -16,11 +16,12 @@ def extract_data(pdf_path):
         if json.dumps(table_data) == "[]":
             try:
                 method = "without_breaker"
+                print("Extraction using With-Breaker failed: ", flush=True)
                 table_data = without_breaker(pdf)
 
             except Exception as e:
                 method = "ternary"
-                print("Extraction using without breaker failed: ", e, flush=True)
+                print("Extraction using Without-Breaker failed: ", e, flush=True)
                 table_data = extract_bank_entries(pdf_path)
 
         print(method)

@@ -60,7 +60,12 @@ def find_header_positions(pdf_path):
 
 
 def extract_bank_entries(pdf_path):
+    print("Final extraction started")
     header_positions = find_header_positions(pdf_path)
+    print("header_positions: ", header_positions)
+    
+    if len(header_positions.items()) == 0:
+        return []
 
     def classify_column(x0, x1):
         sorted_headers = sorted(header_positions.items(), key=lambda item: item[1]['x0'])

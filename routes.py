@@ -4,6 +4,7 @@ import requests
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from scripts.processor import process_pdf
+from starlette.concurrency import run_in_threadpool
 
 pdf_routes = APIRouter()
 
@@ -12,12 +13,13 @@ class PDFUploadRequest(BaseModel):
     pdf_file: str  # URL
     password: str = ""
 
+# Test Route
 @pdf_routes.get("/test")
 def test():
     return {"status": "ok"}
 
 @pdf_routes.post("/upload-pdf")
-def upload_pdf(payload: PDFUploadRequest):
+async def upload_pdf(payload: PDFUploadRequest):
     print("Pdf Received, Request started...")
     try:
         pdf_url = payload.pdf_file
@@ -34,7 +36,7 @@ def upload_pdf(payload: PDFUploadRequest):
 
         print("PDF converted to bytes and moved to processing successfully...")
         # Process the PDF
-        result_json = process_pdf(file_stream)
+        result_json = await run_in_threadpool(process_pdf, file_stream)
 
         return result_json
 

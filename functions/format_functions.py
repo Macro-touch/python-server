@@ -150,27 +150,19 @@ def fetch_amount(raw_entry, trans_type, num_index):
     return str(amount).replace(",", "")
 
 
-def find_transaction_type(raw: list):
-    if "type" in raw:
-        return raw.index("type")
-
-    return None
-
-def is_float(s: str|float) -> bool:
-
-    if (isinstance(s, float)): 
+def is_float(s: str | float) -> bool:
+    if (isinstance(s, float)) or (isinstance(s, int)): 
         return True
     
     if s is None or s == "" or len(s) == 0: 
         return False
 
-    try:
-        float(s.replace(",", ""))
-        return True
-    except ValueError:
-        return False
+    if float(s.replace(",", "")):
+            return True
+    
+    return False
 
-def valid_entry(str_list: list[str]) -> bool:
+def valid_entry(str_list: list[str|None]) -> bool:
     has_date = any(regex_functions.is_date(s) for s in str_list if s is not None)
     has_float = any(is_float(s) for s in str_list if s is not None)
     
@@ -356,6 +348,8 @@ def find_cheque_no_index(entry: dict) -> int:
     for key in possible_keys:
         if key in entry:
             return list(entry.keys()).index(key)
+    
+    return -1
 
 
 def find_first_float(obj, desc_index):
