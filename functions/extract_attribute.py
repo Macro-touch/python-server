@@ -1,9 +1,8 @@
-import regex_functions
-
+from regex_functions import primary_attribute_checker, secondary_attribute_checker, ternary_attribute_checker
 
 def extract_attribute(raw_desc: str, trans_type: str) -> str:
 
-    match = regex_functions.primary_attribute_checker(raw_desc)
+    match = primary_attribute_checker(raw_desc)
     attr_desc = []
 
     if "ATM" in raw_desc:
@@ -14,7 +13,7 @@ def extract_attribute(raw_desc: str, trans_type: str) -> str:
             attr_desc.append("ATM DEPOSIT")
 
     elif match == []:
-        match = regex_functions.secondary_attribute_checker(raw_desc)
+        match = secondary_attribute_checker(raw_desc)
 
     if len(match) > 0:
         if "WITHDRAWAL TRANSFER" in match[0]:
@@ -25,7 +24,7 @@ def extract_attribute(raw_desc: str, trans_type: str) -> str:
 
         else:
             for string in match:
-                attr = regex_functions.ternary_attribute_checker(string)
+                attr = ternary_attribute_checker(string)
 
                 if attr != None:
                     attr_desc.append(attr)
