@@ -156,9 +156,13 @@ def is_float(s: str | float) -> bool:
     
     if s is None or s == "" or len(s) == 0: 
         return False
-
-    if float(s.replace(",", "")):
+    
+    try:
+        if float(s.replace(",", "")):
             return True
+        
+    except ValueError:
+        return False
     
     return False
 
