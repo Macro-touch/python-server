@@ -4,58 +4,35 @@ from constants.MONTHS import MONTHS
 
 
 def ded_section(input_string: str):
+    input_string = input_string.upper()
 
     # best cases first:
-    if input_string == "PENSION":
+    if re.search(r'PENSION', input_string):
         return "80cc"
-    elif input_string == "ELECTRIC" or input_string == "VEHICLE":
+
+    elif re.search(r'(ELECTRIC|VEHICLE)', input_string):
         return "80eeb"
-    elif input_string == "POLITICAL" or input_string == "PARTY":
+
+    elif re.search(r'(POLITICAL|PARTY)', input_string):
         return "80ggb"
 
     # worst cases second:
-    elif input_string in (
-        "INS",
-        "INSURANCE",
-        "LIFE",
-        "HEALTH",
-        "PROVI",
-        "FUND",
-        "PF",
-        "SCHL",
-        "SCHOOL",
-        "CLG",
-        "COLLEGE",
-        "UNIVERSITY",
-        "EDUCATIONAL INSTITUTE",
-        "EDU INST",
-        "STAMP DUTY",
-        "REGISTRATION FEES",
-        "STAMP",
-        "REGISTRAR OFFICE",
-    ):
+    elif re.search(r'\b(INS|INSURANCE|LIFE|HEALTH|PROVI|FUND|PF|SCHL|SCHOOL|CLG|COLLEGE|UNIVERSITY|EDUCATIONAL INSTITUTE|EDU INST|STAMP DUTY|REGISTRATION FEES|STAMP|REGISTRAR OFFICE)\b', input_string):
         return "80c"
 
-    elif input_string in ("MONEY", "MUTUAL", "FUND", "ASSET", "FINAN", "LIFE"):
+    elif re.search(r'\b(MONEY|MUTUAL|FUND|ASSET|FINAN|LIFE)\b', input_string):
         return "80ccg"
 
-    elif input_string in ("MEDI", "HOSP", "HOSPITAL", "CHECKUP", "BODYCHECKUP", "SCAN"):
+    elif re.search(r'\b(MEDI|HOSP|HOSPITAL|CHECKUP|BODYCHECKUP|SCAN)\b', input_string):
         return "80d/80dd"
 
-    elif input_string in (
-        "EDU",
-        "FINAN",
-        "INSTITU",
-        "CHARITAB",
-        "INT",
-        "HOUSE LOAN",
-        "INTEREST",
-        "INTREST",
-    ):
+    elif re.search(r'\b(EDU|FINAN|INSTITU|CHARITAB|INT|HOUSE LOAN|INTEREST|INTREST)\b', input_string):
         return "80ee"
 
-    elif input_string in ("DONATION", "DONA", "TRUST", "HOME", "RENT"):
+    elif re.search(r'\b(DONATION|DONA|TRUST|HOME|RENT)\b', input_string):
         return "80g"
+    
+    return "-"
 
 
 def format_float(input_string: str, count=False):
@@ -224,8 +201,11 @@ def find_transaction_type(raw_entry, check_index) -> str:
         cr_amount = to_float(raw_entry.get("CREDIT AMOUNT"))
         dr_amount = to_float(raw_entry.get("DEBIT AMOUNT"))
 
-        if (cr_amount > 0): return "CR"
-        if (dr_amount > 0): return "DR"
+        if (cr_amount > 0): 
+            return "CR"
+
+        if (dr_amount > 0): 
+            return "DR"
  
     if raw_entry.get("WITHDRAWALS") is not None:
         amt = str(raw_entry.get("WITHDRAWALS"))
@@ -235,6 +215,18 @@ def find_transaction_type(raw_entry, check_index) -> str:
     
     if raw_entry.get("DEPOSITS") is not None:
         amt = str(raw_entry.get("DEPOSITS"))
+
+        if amt and float(amt.replace(',', '')) > 0:
+            return "CR"
+        
+    if raw_entry.get("DEBIT") is not None:
+        amt = str(raw_entry.get("DEBIT"))
+
+        if amt and float(amt.replace(',', '')) > 0: 
+            return "DR"
+    
+    if raw_entry.get("CREDIT") is not None:
+        amt = str(raw_entry.get("CREDIT"))
 
         if amt and float(amt.replace(',', '')) > 0:
             return "CR"
