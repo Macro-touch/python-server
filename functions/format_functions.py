@@ -124,7 +124,7 @@ def fetch_amount(raw_entry, trans_type, num_index):
     else:
         amount = raw_entry.get("AMOUNT") or raw_entry[list(raw_entry.keys())[num_index]]
 
-    return str(amount).replace(",", "")
+    return re.sub("inr", "", str(amount).replace(',', ""), flags=re.IGNORECASE).strip()
 
 
 def is_float(s: str | float) -> bool:
@@ -287,11 +287,11 @@ def convert_closing_balance(input_string: str):
     return None
 
 
-def find_desc(raw):
+def find_desc(raw: dict):
     keys = ["PARTICULARS", "DESCRIPTION", "DETAILS", "NARRATION", "REMARKS"]
 
     for key in keys:
-        if raw.get(key):
+        if key in raw:
             return [list(raw.keys()).index(key), str(raw.get(key))]
         
     return -1 

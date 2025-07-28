@@ -5,8 +5,8 @@ from functions.regex_functions import is_date
 
 # Define configurable keyword lists
 HEADER_KEYWORDS = {
-    "date": ["date", "txn date", "txndate", "transaction date", "transactiondate"],
-    "description": ["particulars", "description", "narration", "transaction reference"],
+    "date": ["date", "txn", "txn date", "txndate", "transaction date", "transactiondate"],
+    "description": ["particulars", "description", "narration", "transaction reference", "transaction details"],
     "debit": {
         "debit", "debits", "withdrawal", "withdrawals", "withdrawl",
         "dr", "debit amount", "debitamount", "withdrawalamt.",

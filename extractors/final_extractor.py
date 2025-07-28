@@ -4,8 +4,8 @@ from functions.regex_functions import is_date
 
 # Define header synonyms
 HEADER_KEYWORDS = {
-    "date": ["date", "txn date", "txndate", "transaction date", "transactiondate"],
-    "description": ["particulars", "description", "narration", "transaction reference"],
+    "date": ["date", "txn", "txn date", "txndate", "transaction date", "transactiondate"],
+    "description": ["details of transaction", "transaction details", "particulars", "description", "narration", "transaction reference"],
     "debit": {
         "debit", "debits", "withdrawal", "withdrawal amt", "withdrawalamt", "withdrawals", "withdrawl",
         "dr", "debit amount", "debitamount", "withdrawalamt.",
@@ -15,8 +15,8 @@ HEADER_KEYWORDS = {
     },
     "amount": {"amount", "amt", "trxn amount", "trxnamount"},
     "type": {"type", "txn type", "txntype", "dr/cr", "cr/dr", "transaction type"},
-    "closing_balance": {"balance", "closingbalance", "closing balance", "bal"},
-    "value date": {"Value Dt", "ValueDt", "value date"},
+    "closing_balance": {"balance", "balance(inr)", "closingbalance", "closing balance", "bal"},
+    "value date": {"Value Dt", "value", "ValueDt", "value date"},
     "ref. no.": {"chq.no.", "ref.no.", "ref. no.", "ref.No./chq.No.", "chq. / ref. No", "Chq./Ref.No."},
 }
 
@@ -34,67 +34,69 @@ def is_broken_line(columns):
         and not columns["closing_balance"]
     )
 
+def find_header_positions(headers: dict, page_width: int):
+    sorted_headers = sorted(headers.items(), key=lambda item: item[1]['x0'])
+    positions = {}
+    
+    start = 0
+    for i, (col_name, pos) in enumerate(sorted_headers):
+        end = page_width
+        if i < len(sorted_headers) - 1:
+            end = sorted_headers[i + 1][1]['x0']
+            
+        positions[col_name] = [start, end]
+        start = pos['x1']
+    
+    return positions
+
 # Function to find headers and their x0
-def find_header_positions(pdf_path):
+def find_headers(pdf_path):
+    page_num = 0
     header_positions = {}
+    page_width = 0
+    
     with pdfplumber.open(pdf_path) as pdf:
-        first_page = pdf.pages[0]
-        words = first_page.extract_words(
-                        x_tolerance=0.5, 
-                        y_tolerance=3, 
-                        use_text_flow=True, 
-                        keep_blank_chars=True
-                    )
+        while page_num < len(pdf.pages):
+            curr_page = pdf.pages[page_num]
+            page_width = curr_page.width
+            words = curr_page.extract_words(
+                            x_tolerance=0.5, 
+                            y_tolerance=3, 
+                            use_text_flow=True, 
+                            keep_blank_chars=True
+                        )
 
-        for word in words:
-            norm_word = normalize(word['text'])
-            for header, aliases in HEADER_KEYWORDS.items():
-                aliases = [a.lower().strip().replace('.','') for a in aliases]
-                if norm_word in aliases and header not in header_positions:
-                    header_positions[header] = {
-                        'x0': word['x0'],
-                        'x1': word['x1']
-                    }
+            for word in words:
+                norm_word = normalize(word['text'])
+                for header, aliases in HEADER_KEYWORDS.items():
+                    aliases = [a.lower().strip().replace('.','') for a in aliases]
+                    if norm_word in aliases and header not in header_positions:
+                        header_positions[header] = {
+                            'x0': word['x0'],
+                            'x1': word['x1']
+                        }
+            
+            if len(header_positions) > 0:
+                break
 
-    return header_positions
+            page_num = page_num + 1
+
+    print("Header found on page num: ", page_num)
+    return find_header_positions(header_positions, page_width)
 
 
 def extract_bank_entries(pdf_path):
     print("Final extraction started")
-    header_positions = find_header_positions(pdf_path)
-    print("header_positions: ", header_positions)
+    header_positions = find_headers(pdf_path)
     
     if len(header_positions.items()) == 0:
         return []
 
     def classify_column(x0, x1):
-        sorted_headers = sorted(header_positions.items(), key=lambda item: item[1]['x0'])
-
-        closest_col = None
-        min_dist = float('inf')
-
-        for i, (col_name, pos) in enumerate(sorted_headers):
-            center = (pos['x0'] + pos['x1']) / 2
-            dist = abs(x0 - center)
-
-            # Additional condition: word must not lie before previous header's x1
-            if i > 0:
-                prev_x1 = sorted_headers[i - 1][1]['x1']
-                if x0 < prev_x1:
-                    continue
-
-            if dist < min_dist:
-                min_dist = dist
-                closest_col = col_name
-
-            # 2. Additional logic: if this header’s x1 exceeds the next header’s x1,
-            # and the word is visually closer to the next header → prefer next column
-            if i < len(sorted_headers) - 1:
-                next_col_name, next_pos = sorted_headers[i + 1]
-                if x1 >= next_pos['x1']:
-                    closest_col = next_col_name
-
-        return closest_col if min_dist < 60 else None
+        for col_name, pos in header_positions.items():
+            if x0 >= pos[0] and x1 <= pos[1]:
+                return col_name
+        return None
 
     all_entries = []
     last_entry = None
@@ -122,6 +124,7 @@ def extract_bank_entries(pdf_path):
                     "closing_balance": ""
                 }
 
+                # Classifying rows
                 for word in row_words:
                     col = classify_column(word["x0"], word["x1"])
                     if col and col in columns.keys():
@@ -141,10 +144,10 @@ def extract_bank_entries(pdf_path):
                     continue
 
                 # Determine transaction type
-                if columns["credit"] and not columns["debit"]:
+                if columns["credit"] and (columns['debit'].strip() == '-' or not columns["debit"]):
                     trans_type = "credit"
                     amount = columns["credit"]
-                elif columns["debit"] and not columns["credit"]:
+                elif columns["debit"] and (columns['credit'].strip() == '-' or not columns["credit"]):
                     trans_type = "debit"
                     amount = columns["debit"]
                 elif columns["amount"] and columns["type"]:
