@@ -1,11 +1,11 @@
 import pdfplumber
-from collections import defaultdict
 from functions.regex_functions import is_date
 
 # Define header synonyms
 HEADER_KEYWORDS = {
-    "date": ["date", "txn", "txn date", "txndate", "transaction date", "transactiondate"],
-    "description": ["details of transaction", "transaction details", "particulars", "description", "narration", "transaction reference"],
+    "serial": {"sr.no"},
+    "date": {"date", "transaction", "txn", "txn date", "txndate", "transaction date", "transactiondate"},
+    "description": {"details of transaction", "transaction details", "particulars", "description", "narration", "transaction reference"},
     "debit": {
         "debit", "debits", "withdrawal", "withdrawal amt", "withdrawalamt", "withdrawals", "withdrawl",
         "dr", "debit amount", "debitamount", "withdrawalamt.",
@@ -34,31 +34,63 @@ def is_broken_line(columns):
         and not columns["closing_balance"]
     )
 
-def find_header_positions(headers: dict, page_width: int):
-    sorted_headers = sorted(headers.items(), key=lambda item: item[1]['x0'])
+def format_headers(header_list: list[dict]) -> list[dict]:
+    merged = []
+
+    for current in header_list:
+        merged_flag = False
+        for existing in merged:
+            if current['header'] == existing['header']:
+                # Check if current x0-x1 is fully inside existing range AND has higher top value
+                if existing['x0'] <= current['x0'] <= current['x1'] <= existing['x1'] and current['top'] > existing['top']:
+                    # Merge: expand x0 and x1, keep the top of the existing (lower one)
+                    existing['x0'] = min(existing['x0'], current['x0'])
+                    existing['x1'] = max(existing['x1'], current['x1'])
+                    merged_flag = True
+                    break
+
+        if not merged_flag:
+            # Only add if it's the first one of its type
+            if not any(current['header'] == m['header'] for m in merged):
+                merged.append(current.copy())
+            # Else: it’s a duplicate but didn’t meet merge condition → skip
+
+    return merged
+
+
+def find_header_positions(headers: list[dict], page_width: int, average_y_axis: int):
+    sorted_headers = sorted(format_headers(headers), key=lambda item: item['x0'])
     positions = {}
+    y_axis_range = [average_y_axis - 10, average_y_axis + 10]
     
     start = 0
-    for i, (col_name, pos) in enumerate(sorted_headers):
+    for i, header in enumerate(sorted_headers):
+        # Neglecting the mistakenly extracted headers
+        if header['top'] < y_axis_range[0] or header['top'] > y_axis_range[1]:
+            print(header)
+            continue
+        
         end = page_width
         if i < len(sorted_headers) - 1:
-            end = sorted_headers[i + 1][1]['x0']
-            
-        positions[col_name] = [start, end]
-        start = pos['x1']
+            end = sorted_headers[i + 1]['x0']
+        
+        positions[header['header']] = [start, end]
+        start = header['x1']
     
+    # print(positions)
     return positions
 
 # Function to find headers and their x0
 def find_headers(pdf_path):
     page_num = 0
-    header_positions = {}
     page_width = 0
     
     with pdfplumber.open(pdf_path) as pdf:
         while page_num < len(pdf.pages):
             curr_page = pdf.pages[page_num]
             page_width = curr_page.width
+            possible_headers = []
+            total_y_axis = 0
             words = curr_page.extract_words(
                             x_tolerance=0.5, 
                             y_tolerance=3, 
@@ -69,26 +101,33 @@ def find_headers(pdf_path):
             for word in words:
                 norm_word = normalize(word['text'])
                 for header, aliases in HEADER_KEYWORDS.items():
-                    aliases = [a.lower().strip().replace('.','') for a in aliases]
-                    if norm_word in aliases and header not in header_positions:
-                        header_positions[header] = {
+                    aliases = [normalize(a) for a in aliases]
+                    if norm_word in aliases:
+                        possible_headers.append({
+                            'header': header,
                             'x0': word['x0'],
-                            'x1': word['x1']
-                        }
+                            'x1': word['x1'],
+                            'top': word['top']
+                        })
+                        total_y_axis += word['top']
             
-            if len(header_positions) > 0:
+            if len(possible_headers) > 0:
                 break
 
             page_num = page_num + 1
 
     print("Header found on page num: ", page_num)
-    return find_header_positions(header_positions, page_width)
+    return find_header_positions(
+            possible_headers, 
+            page_width, 
+            total_y_axis / len(possible_headers)
+        )
 
 
 def extract_bank_entries(pdf_path):
     print("Final extraction started")
     header_positions = find_headers(pdf_path)
-    
+     
     if len(header_positions.items()) == 0:
         return []
 
@@ -102,6 +141,11 @@ def extract_bank_entries(pdf_path):
     last_entry = None
 
     with pdfplumber.open(pdf_path) as pdf:
+        rows = []
+        row  = []
+        row_start_x0 = 0
+        # row_start_top = 0
+
         for page in pdf.pages:
             words = page.extract_words(
                         x_tolerance=0.5, 
@@ -110,13 +154,17 @@ def extract_bank_entries(pdf_path):
                         keep_blank_chars=True
                     )
 
-            # Step 1: group words by row (by 'top')
-            rows = defaultdict(list)
             for word in words:
-                top_key = round(word['top'] / 3) * 3  # cluster nearby rows
-                rows[top_key].append(word)
+                if word['x0'] < row_start_x0:
+                    if len(row) > 0:
+                        rows.append(row)
+                        row = []
+                
+                row.append(word)
+                row_start_x0 = word['x0']
+                # row_start_top = word
 
-            for top, row_words in sorted(rows.items()):
+            for row_words in rows:
                 columns = {
                     "date": "", "description": "",
                     "debit": "", "credit": "",
@@ -144,10 +192,10 @@ def extract_bank_entries(pdf_path):
                     continue
 
                 # Determine transaction type
-                if columns["credit"] and (columns['debit'].strip() == '-' or not columns["debit"]):
+                if columns["credit"] and columns['credit'] != '-' and (columns['debit'] == '-' or not columns["debit"]):
                     trans_type = "credit"
                     amount = columns["credit"]
-                elif columns["debit"] and (columns['credit'].strip() == '-' or not columns["credit"]):
+                elif columns["debit"] and columns['debit'] != '-' and (columns['credit'] == '-' or not columns["credit"]):
                     trans_type = "debit"
                     amount = columns["debit"]
                 elif columns["amount"] and columns["type"]:
@@ -164,7 +212,7 @@ def extract_bank_entries(pdf_path):
                     amount = ""
 
                 # Valid entry
-                if is_date(columns["date"]):
+                if is_date(columns["date"]) and not "closing balance" in columns['description'].lower():
                     entry = {
                         "date": columns["date"],
                         "description": columns["description"],
