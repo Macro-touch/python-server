@@ -20,7 +20,7 @@ HEADER_KEYWORDS = {
 }
 
 VALUE_DATE_KEYWORDS = {"value date"}
-EXCLUDE_KEYWORDS = {"value date", "chq.no.", "ref.no.", "ref. no.", "ref.No./chq.No.", "chq. / ref. No"}
+EXCLUDE_KEYWORDS = {"value date", "chq no", "chqno", "chq.no.", "ref.no.", "ref. no.", "ref.No./chq.No.", "chq. / ref. No"}
 DR_CR_KEYWORDS = {"dr/cr", "cr/dr"}
 AMOUNT_KEYWORDS = {"amount", "txn amount", "txnamount", "trxn amount", "trxn amount"}
 

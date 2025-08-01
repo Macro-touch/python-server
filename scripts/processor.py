@@ -24,7 +24,7 @@ def extract_data(pdf_path: str):
                 print("Extraction using Without-Breaker failed: ", e, flush=True)
                 table_data = extract_bank_entries(pdf_path)
 
-        print(method)
+        print("Extracted Method: ", method)
         return table_data
 
 

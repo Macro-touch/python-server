@@ -53,31 +53,31 @@ def format_headers(header_list: list[dict]) -> list[dict]:
             # Only add if it's the first one of its type
             if not any(current['header'] == m['header'] for m in merged):
                 merged.append(current.copy())
-            # Else: it’s a duplicate but didn’t meet merge condition → skip
 
     return merged
 
 
 def find_header_positions(headers: list[dict], page_width: int, average_y_axis: int):
-    sorted_headers = sorted(format_headers(headers), key=lambda item: item['x0'])
-    positions = {}
     y_axis_range = [average_y_axis - 10, average_y_axis + 10]
     
+    # sorting headers based on the x0 (ascending)
+    sorted_headers = sorted(headers, key=lambda item: item['x0'])
+    
+    # removing the out of bound headers
+    ranged_headers = format_headers([h for h in sorted_headers if  h['top'] >= y_axis_range[0] and h['top'] <= y_axis_range[1]])
+
+    positions = {}
     start = 0
-    for i, header in enumerate(sorted_headers):
-        # Neglecting the mistakenly extracted headers
-        if header['top'] < y_axis_range[0] or header['top'] > y_axis_range[1]:
-            print(header)
-            continue
+    for i, header in enumerate(ranged_headers):
         
         end = page_width
-        if i < len(sorted_headers) - 1:
-            end = sorted_headers[i + 1]['x0']
+        if i < len(ranged_headers) - 1:
+            end = ranged_headers[i + 1]['x0']
         
         positions[header['header']] = [start, end]
         start = header['x1']
-    
-    # print(positions)
+
+    print(positions)
     return positions
 
 # Function to find headers and their x0
@@ -163,6 +163,11 @@ def extract_bank_entries(pdf_path):
                 row.append(word)
                 row_start_x0 = word['x0']
                 # row_start_top = word
+            
+            # Adding the last entry into rows at page end;
+            if len(row) > 0:
+                rows.append(row)
+                row = []
 
             for row_words in rows:
                 columns = {
