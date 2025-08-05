@@ -43,7 +43,7 @@ def with_breaker(pdf):
             for col, val in enumerate(row):
                 if (val is not None or len(row) == len(headers)) and headers[i]:
                     
-                    entry[headers[i]] = float(val) if val is not None and val.isdigit() else (
+                    entry[headers[i].upper()] = float(val) if val is not None and val.isdigit() else (
                             val.split("\n")[0]
                             if val is not None and bool(contains_new_line.match(val))
                             else val

@@ -211,7 +211,7 @@ def extract_bank_entries(pdf_path):
 
                 if is_broken_line(columns) and last_entry:
                     # Merge broken description
-                    last_entry["description"] += " " + columns["description"]
+                    last_entry["DESCRIPTION"] += " " + columns["description"]
                     continue
 
                 # Skip empty or header rows
@@ -246,23 +246,24 @@ def extract_bank_entries(pdf_path):
                         if "dr" in amount:
                             trans_type = "DR"
                 
-                if "closing balance" in columns['description'].lower() or "opening balance" in columns['description'].lower():
+                # Invalid entry or description in an entry
+                desc = columns['description'].lower().strip()
+                if len(desc) == 0 or "closing balance" in desc or "opening balance" in desc:
+                    continue
+                
+                # Invalid amount in an entry
+                if amount == "" or amount is None or trans_type == 'unknown':
                     continue
 
-                # Valid entry
-                if is_date(columns["date"]):
-                    if amount != "" or amount is not None:
-                        amount = extract_amount(str(amount))
-                    
-                    entry = {
-                        "date": columns["date"],
-                        "description": columns["description"],
-                        "amount": amount,
-                        "type": trans_type,
-                        "closing_balance": columns["closing_balance"]
-                    }
-                    # print(entry, flush=True)
-                    all_entries.append(entry)
-                    last_entry = entry
+                entry = {
+                    "DATE": columns["date"],
+                    "DESCRIPTION": columns["description"],
+                    "AMOUNT": extract_amount(str(amount)),
+                    "TYPE": trans_type,
+                    "CLOSING_BALANCE": columns["closing_balance"]
+                }
+                # print(entry, flush=True)
+                all_entries.append(entry)
+                last_entry = entry
 
     return all_entries

@@ -11,19 +11,8 @@ from functions.format_functions import (
 
 
 def format_entries(data) -> list[dict]:
-    data_upper = []
     entries = []
-
-    for input_dict in data:
-        renewed = {
-            key.upper(): "-" if value is None else value
-            for key, value in input_dict.items()
-        }
-        data_upper.append(renewed)
-
-    data = data_upper
     for raw_entry in data:
-
         date = find_date(raw_entry)
         alpha_pattern = re.compile(r"\d+")
 
