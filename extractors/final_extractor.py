@@ -17,7 +17,7 @@ HEADER_KEYWORDS = {
     "type": {"type", "txn type", "txntype", "dr/cr", "cr/dr", "transaction type"},
     "closing_balance": {"balance", "balance(inr)", "closingbalance", "closing balance", "bal"},
     "value date": {"Value Dt", "value", "ValueDt", "value date"},
-    "ref. no.": {"chq.no.", "chq no", "ref.no.", "ref. no.", "ref.No./chq.No.", "chq. / ref. No", "Chq./Ref.No."},
+    "ref. no.": {"chq.no.", "chq no", "ref.no.", "chq/ref No", "ref. no.", "ref.No./chq.No.", "chq. / ref. No", "Chq./Ref.No."},
 }
 
 # Normalize text function
@@ -234,16 +234,17 @@ def extract_bank_entries(pdf_path):
                     else:
                         trans_type = "unknown"
                     amount = columns["amount"]
-                # elif columns['amount']:
-                #     trans_type = "unknown"
-                #     amount = ""
-                #     if "cr" in columns['amount']:
-                #         trans_type = "credit"
-                #     if "dr" in columns['amount']:
-                #         trans_type = "debit"
                 else:
                     trans_type = "unknown"
                     amount = ""
+                    
+                    if len(columns['amount']) > 0 and columns['amount'] is not None:
+                        amt = columns['amount'].strip().lower()
+                        if "cr" in amt:
+                            trans_type = "CR"
+                        if "dr" in amt:
+                            trans_type = "DR"
+                        amount = amt
 
                 # Valid entry
                 if is_date(columns["date"]) and not "closing balance" in columns['description'].lower():
