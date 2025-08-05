@@ -3,7 +3,7 @@ import traceback
 import requests
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from scripts.processor import process_pdf
+from scripts.unlock_pdf import unlock_pdf
 from starlette.concurrency import run_in_threadpool
 
 pdf_routes = APIRouter()
@@ -35,8 +35,9 @@ async def upload_pdf(payload: PDFUploadRequest):
         file_stream = io.BytesIO(response.content)
 
         print("PDF converted to bytes and moved to processing successfully...")
+
         # Process the PDF
-        result_json = await run_in_threadpool(process_pdf, file_stream)
+        result_json = await run_in_threadpool(unlock_pdf, file_stream, password)
 
         return result_json
 

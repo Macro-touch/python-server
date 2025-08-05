@@ -11,3 +11,4 @@ uvicorn==0.35.0
 uvloop==0.21.0
 watchfiles==1.1.0
 deptry==0.23.0
+pypdf==5.9.0
