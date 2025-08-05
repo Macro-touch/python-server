@@ -1,36 +1,26 @@
 import pdfplumber
 import json
 
-from extractors.without_breaker import without_breaker
 from extractors.with_breaker import with_breaker
 from extractors.final_extractor import extract_bank_entries
 from formatters.entry_format import format_entries
 from scripts.segregate import segregate
 
 
-def extract_data(pdf_path: str):
-    with pdfplumber.open(pdf_path) as pdf:
-        method = "with_breaker"
+def extract_data(pdf_stream: str):
+    with pdfplumber.open(pdf_stream) as pdf:
         table_data = with_breaker(pdf)
 
         if json.dumps(table_data) == "[]":
-            try:
-                method = "without_breaker"
-                print("Extraction using With-Breaker failed: ", flush=True)
-                table_data = without_breaker(pdf)
+            print("Table Extraction Failed", flush=True)
+            table_data = extract_bank_entries(pdf_stream)
 
-            except Exception as e:
-                method = "ternary"
-                print("Extraction using Without-Breaker failed: ", e, flush=True)
-                table_data = extract_bank_entries(pdf_path)
-
-        print("Extracted Method: ", method)
         return table_data
 
 
-def process_pdf(file):
+def process_pdf(pdf_stream):
     print("Processing pdf...")
-    data = extract_data(file)
+    data = extract_data(pdf_stream)
 
     try:
         print("Formatting processed data...")
