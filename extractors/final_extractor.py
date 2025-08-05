@@ -1,5 +1,5 @@
 import pdfplumber
-from functions.regex_functions import is_date
+from functions.regex_functions import is_date, extract_amount
 
 # Define header synonyms
 HEADER_KEYWORDS = {
@@ -13,11 +13,11 @@ HEADER_KEYWORDS = {
     "credit": { "credit", "credits", "deposit amt" , "deposit", "deposits", "depositamt",
                 "cr", "credit amount", "creditamount", "depositamt."
     },
-    "amount": {"amount", "amt", "trxn amount", "trxnamount"},
+    "amount": {"amount", "amt", "trxn amount", "trxnamount", "withdrawal(dr)/"},
     "type": {"type", "txn type", "txntype", "dr/cr", "cr/dr", "transaction type"},
     "closing_balance": {"balance", "balance(inr)", "closingbalance", "closing balance", "bal"},
     "value date": {"Value Dt", "value", "ValueDt", "value date"},
-    "ref. no.": {"chq.no.", "ref.no.", "ref. no.", "ref.No./chq.No.", "chq. / ref. No", "Chq./Ref.No."},
+    "ref. no.": {"chq.no.", "chq no", "ref.no.", "ref. no.", "ref.No./chq.No.", "chq. / ref. No", "Chq./Ref.No."},
 }
 
 # Normalize text function
@@ -170,15 +170,37 @@ def extract_bank_entries(pdf_path):
                 row = []
 
             for row_words in rows:
+                total_words = len(row_words)
+                
+                # Invalid no. of cells in a row
+                if total_words <= 3:
+                    continue
+                
                 columns = {
                     "date": "", "description": "",
                     "debit": "", "credit": "",
                     "amount": "", "type": "",
                     "closing_balance": ""
                 }
+                
+                # Capturing broken description
+                # Valid only if the extraction order is like:
+                    # Date
+                    # -> Desc. line: 1
+                    # -> Desc. line: 2
+                    # Amount
+                    # Balance
+                curr = 0
+                while curr < total_words:
+                    word = row_words[curr]
+                    
+                    next = curr + 1
+                    while next < total_words and word["x0"] == row_words[next]["x0"]:
+                        word["text"] += row_words[next]["text"]
+                        word["x1"] = max(word["x1"], row_words[next]["x1"])
+                        next += 1
+                    curr = next
 
-                # Classifying rows
-                for word in row_words:
                     col = classify_column(word["x0"], word["x1"])
                     if col and col in columns.keys():
                         columns[col] += word["text"] + " "
@@ -212,12 +234,22 @@ def extract_bank_entries(pdf_path):
                     else:
                         trans_type = "unknown"
                     amount = columns["amount"]
+                # elif columns['amount']:
+                #     trans_type = "unknown"
+                #     amount = ""
+                #     if "cr" in columns['amount']:
+                #         trans_type = "credit"
+                #     if "dr" in columns['amount']:
+                #         trans_type = "debit"
                 else:
                     trans_type = "unknown"
                     amount = ""
 
                 # Valid entry
                 if is_date(columns["date"]) and not "closing balance" in columns['description'].lower():
+                    if amount != "" or amount is not None:
+                        amount = extract_amount(str(amount))
+                    
                     entry = {
                         "date": columns["date"],
                         "description": columns["description"],

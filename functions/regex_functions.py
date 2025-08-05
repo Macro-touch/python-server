@@ -13,6 +13,12 @@ def is_amount(input_str):
     match = re.match(pattern, input_str)
     return bool(match)
 
+def extract_amount(input_str: str | None) -> str | None:
+    if input_str is None:
+        return None
+    
+    match = re.search(r'-?\d+(?:\.\d+)?', input_str)
+    return match.group() if match else None
 
 def extract_numbers(input_string):
     check = re.sub(r"[^0-9.]", "", input_string)
