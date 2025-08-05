@@ -1,5 +1,6 @@
 import re
 from re import Match
+from typing import Optional
 
 from data.regex_patterns import keyword_pattern
 from data.regex_patterns import date_regex
@@ -13,11 +14,18 @@ def is_amount(input_str):
     match = re.match(pattern, input_str)
     return bool(match)
 
-def extract_amount(input_str: str | None) -> str | None:
+def extract_amount(input_str: Optional[str]) -> Optional[str]:
     if input_str is None:
         return None
-    
-    match = re.search(r'-?\d+(?:\.\d+)?', input_str)
+
+    # Remove currency symbols and whitespace before matching
+    cleaned_str = re.sub(r'[^\d.,\-]', '', input_str)
+
+    # Remove commas (thousands separators)
+    cleaned_str = cleaned_str.replace(',', '')
+
+    # Find number (with optional decimal and optional negative sign)
+    match = re.search(r'-?\d+(?:\.\d+)?', cleaned_str)
     return match.group() if match else None
 
 def extract_numbers(input_string):

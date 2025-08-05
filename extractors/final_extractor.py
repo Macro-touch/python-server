@@ -217,6 +217,9 @@ def extract_bank_entries(pdf_path):
                 # Skip empty or header rows
                 if not columns["date"] or columns["date"].lower().startswith("date"):
                     continue
+                
+                amount = ""
+                trans_type = "unknown"
 
                 # Determine transaction type
                 if columns["credit"] and columns['credit'] != '-' and (columns['debit'] == '-' or not columns["debit"]):
@@ -231,23 +234,23 @@ def extract_bank_entries(pdf_path):
                         trans_type = "credit"
                     elif "dr" in trans_type or "debit" in trans_type:
                         trans_type = "debit"
-                    else:
-                        trans_type = "unknown"
                     amount = columns["amount"]
                 else:
-                    trans_type = "unknown"
-                    amount = ""
+                    if columns["amount"] is None:
+                        continue
+                    amount = columns['amount'].strip().lower()
                     
-                    if len(columns['amount']) > 0 and columns['amount'] is not None:
-                        amt = columns['amount'].strip().lower()
-                        if "cr" in amt:
+                    if columns["amount"] != "-" and len(columns['amount']) > 0:
+                        if "cr" in amount:
                             trans_type = "CR"
-                        if "dr" in amt:
+                        if "dr" in amount:
                             trans_type = "DR"
-                        amount = amt
+                
+                if "closing balance" in columns['description'].lower() or "opening balance" in columns['description'].lower():
+                    continue
 
                 # Valid entry
-                if is_date(columns["date"]) and not "closing balance" in columns['description'].lower():
+                if is_date(columns["date"]):
                     if amount != "" or amount is not None:
                         amount = extract_amount(str(amount))
                     
