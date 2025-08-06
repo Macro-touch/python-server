@@ -3,9 +3,9 @@ from functions.regex_functions import is_date, extract_amount
 
 # Define header synonyms
 HEADER_KEYWORDS = {
-    "serial": {"sr.no"},
+    "serial": {"s.no", "sr.no"},
     "date": {"date", "transaction", "txn", "txn date", "txndate", "transaction date", "transactiondate"},
-    "description": {"details of transaction", "transaction details", "particulars", "description", "narration", "transaction reference"},
+    "description": { "remarks", "details of transaction", "transaction details", "particulars", "description", "narration", "transaction reference"},
     "debit": {
         "debit", "debits", "withdrawal", "withdrawal amt", "withdrawalamt", "withdrawals", "withdrawl",
         "dr", "debit amount", "debitamount", "withdrawalamt.",
@@ -13,11 +13,11 @@ HEADER_KEYWORDS = {
     "credit": { "credit", "credits", "deposit amt" , "deposit", "deposits", "depositamt",
                 "cr", "credit amount", "creditamount", "depositamt."
     },
-    "amount": {"amount", "amt", "trxn amount", "trxnamount", "withdrawal(dr)/"},
+    "amount": {"amount", "amount(rs.)", "amt", "trxn amount", "trxnamount", "withdrawal(dr)/"},
     "type": {"type", "txn type", "txntype", "dr/cr", "cr/dr", "transaction type"},
     "closing_balance": {"balance", "balance(inr)", "closingbalance", "closing balance", "bal"},
     "value date": {"Value Dt", "value", "ValueDt", "value date"},
-    "ref. no.": {"chq.no.", "chq no", "ref.no.", "chq/ref No", "ref. no.", "ref.No./chq.No.", "chq. / ref. No", "Chq./Ref.No."},
+    "ref. no.": {"chq.no.", "chq no", "ref.no.", "chq/ref No", "ref. no.", "ref.No./chq.No.", "chq. / ref. No", "Chq./Ref.No.", "reference no."},
 }
 
 # Normalize text function
@@ -141,11 +141,6 @@ def extract_bank_entries(pdf_path):
     last_entry = None
 
     with pdfplumber.open(pdf_path) as pdf:
-        rows = []
-        row  = []
-        row_start_x0 = 0
-        # row_start_top = 0
-
         for page in pdf.pages:
             words = page.extract_words(
                         x_tolerance=0.5, 
@@ -154,6 +149,10 @@ def extract_bank_entries(pdf_path):
                         keep_blank_chars=True
                     )
 
+            row = []
+            rows = []
+            row_start_x0 = 0
+            
             for word in words:
                 if word['x0'] < row_start_x0:
                     if len(row) > 0:
@@ -162,7 +161,6 @@ def extract_bank_entries(pdf_path):
                 
                 row.append(word)
                 row_start_x0 = word['x0']
-                # row_start_top = word
             
             # Adding the last entry into rows at page end;
             if len(row) > 0:
@@ -245,6 +243,10 @@ def extract_bank_entries(pdf_path):
                             trans_type = "CR"
                         if "dr" in amount:
                             trans_type = "DR"
+                            
+                # Invalid date
+                if not is_date(columns["date"]):
+                    continue
                 
                 # Invalid entry or description in an entry
                 desc = columns['description'].lower().strip()
