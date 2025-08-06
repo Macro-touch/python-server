@@ -287,14 +287,18 @@ def convert_closing_balance(input_string: str):
     return None
 
 
-def find_desc(raw: dict):
-    keys = ["PARTICULARS", "DESCRIPTION", "DETAILS", "NARRATION", "REMARKS"]
+def find_desc(raw: dict) -> list[int]:
+    keys = [
+            "PARTICULARS", "DESCRIPTION", 
+            "DETAILS", "NARRATION", "REMARKS", 
+            "TRANSACTION\nDESCRIPTION", 
+        ]
 
     for key in keys:
         if key in raw:
             return [list(raw.keys()).index(key), str(raw.get(key))]
         
-    return -1 
+    return [-1, -1]
 
 def find_attr(raw_desc, transc_type):
 
